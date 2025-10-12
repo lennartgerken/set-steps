@@ -1,4 +1,5 @@
 import test from '@playwright/test'
+import { getLocation } from './get-location'
 
 export type Logs<T> = {
     [Key in keyof T]?: T[Key] extends (...args: any[]) => any
@@ -34,10 +35,11 @@ export abstract class LogElement<T extends object> {
                             returnValue = test.step(
                                 logFunction(target.usedName, args),
                                 () => {
-                                    return original.apply(receiver, args)
-                                }
+                                    return original.apply(target.base, args)
+                                },
+                                { location: getLocation() }
                             )
-                        } else returnValue = original.apply(receiver, args)
+                        } else returnValue = original.apply(target.base, args)
 
                         return alterReturn(returnValue)
                     }

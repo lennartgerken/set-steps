@@ -1,5 +1,6 @@
 import test, { expect as base } from '@playwright/test'
 import { LogElement } from './log-element'
+import { getLocation } from './get-location'
 
 export type Logs = {
     [K in keyof ReturnType<typeof base<any>>]?: ReturnType<
@@ -50,11 +51,12 @@ export class LogExpect {
                                 return test.step(
                                     logFunction(actual, not, args),
                                     () => {
-                                        return original.apply(receiver, args)
-                                    }
+                                        return original.apply(target, args)
+                                    },
+                                    { location: getLocation() }
                                 )
                             }
-                            return original.apply(receiver, args)
+                            return original.apply(target, args)
                         }
                     }
 

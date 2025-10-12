@@ -7,7 +7,7 @@ export default [
             file: 'dist/esm/index.js',
             format: 'es'
         },
-        external: ['@playwright/test'],
+        external: ['@playwright/test', 'url'],
         plugins: [
             typescript({
                 compilerOptions: {
@@ -23,7 +23,7 @@ export default [
             file: 'dist/cjs/index.cjs',
             format: 'cjs'
         },
-        external: ['@playwright/test'],
+        external: ['@playwright/test', 'url'],
         plugins: [typescript()]
     }
 ]
