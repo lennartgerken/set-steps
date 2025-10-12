@@ -1,0 +1,32 @@
+name: Verify PR
+
+on:
+    pull_request:
+        branches: [main]
+
+jobs:
+    verify-pr:
+        timeout-minutes: 2
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        container:
+            image: mcr.microsoft.com/playwright:v1.56.0-noble
+            options: --user 1001
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22.x'
+            - name: Install dependencies
+              run: npm ci
+            - name: Prettier
+              run: npm run pretty-check
+            - name: ESLint
+              run: npm run lint
+            - name: Build
+              run: npm run build
+            - name: Run tests
+              run: npm run test
