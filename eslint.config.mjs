@@ -10,6 +10,10 @@ export default defineConfig(
         rules: {
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-unsafe-declaration-merging': 'off',
+            '@typescript-eslint/no-empty-object-type': [
+                'error',
+                { allowInterfaces: 'always' }
+            ],
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 {

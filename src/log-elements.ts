@@ -22,15 +22,33 @@ type AllLogs = {
     locatorLogs?: Logs<Locator>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+function isBrowser(value: unknown): value is Browser {
+    return (value as Browser).newContext !== undefined
+}
+
+function isContext(value: unknown): value is BrowserContext {
+    return (value as BrowserContext).addCookies !== undefined
+}
+
+function isPage(value: unknown): value is Page {
+    return (value as Page).goto !== undefined
+}
+
+function isRequest(value: unknown): value is APIRequestContext {
+    return (value as APIRequestContext).fetch !== undefined
+}
+
+function isLocator(value: unknown): value is Locator {
+    return (
+        (value as Locator).fill !== undefined &&
+        (value as Page).goto === undefined
+    )
+}
+
 export interface LogBrowser extends Browser {}
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LogContext extends BrowserContext {}
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LogRequest extends APIRequestContext {}
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LogPage extends Page {}
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LogLocator extends Locator {}
 
 export abstract class LogElement<T extends object> {
@@ -50,19 +68,20 @@ export abstract class LogElement<T extends object> {
             if (Array.isArray(returnValue))
                 return returnValue.map((current: any) => alterReturn(current))
 
-            if (returnValue) {
-                if (returnValue.newContext)
+            if (returnValue !== undefined) {
+                if (isBrowser(returnValue))
                     return new LogBrowser(returnValue, logs)
 
-                if (returnValue.addCookies)
+                if (isContext(returnValue))
                     return new LogContext(returnValue, logs)
 
-                if (returnValue.fill) {
-                    if (returnValue.goto) return new LogPage(returnValue, logs)
-                    return new LogLocator(returnValue, logs)
-                }
+                if (isPage(returnValue)) return new LogPage(returnValue, logs)
 
-                if (returnValue.fetch) return new LogRequest(returnValue, logs)
+                if (isLocator(returnValue))
+                    return new LogLocator(returnValue, logs)
+
+                if (isRequest(returnValue))
+                    return new LogRequest(returnValue, logs)
             }
             return returnValue
         }
@@ -75,20 +94,22 @@ export abstract class LogElement<T extends object> {
                 if (typeof original === 'function') {
                     return (...args: any[]) => {
                         let logsToUse: any
-                        if (target instanceof LogBrowser)
+
+                        if (isBrowser(target.base))
                             logsToUse = target.logs.browserLogs
-                        if (target instanceof LogContext)
+                        else if (isContext(target.base))
                             logsToUse = target.logs.contextLogs
-                        if (target instanceof LogRequest)
+                        else if (isRequest(target.base))
                             logsToUse = target.logs.requestLogs
-                        if (target instanceof LogPage)
+                        else if (isPage(target.base))
                             logsToUse = target.logs.pageLogs
-                        if (target instanceof LogLocator)
+                        else if (isLocator(target.base))
                             logsToUse = target.logs.locatorLogs
 
                         const logFunction = logsToUse
                             ? logsToUse[prop]
                             : undefined
+
                         if (logFunction !== undefined) {
                             return test.step(
                                 logFunction(target.usedName, args),
