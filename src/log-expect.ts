@@ -1,26 +1,27 @@
-import test, { expect as base } from '@playwright/test'
-import { LogElement } from './log-element'
+import test from '@playwright/test'
+import type { Expect } from '@playwright/test'
+import { LogElement } from './log-elements'
 import { getLocation } from './get-location'
 
-export type Logs = {
-    [K in keyof ReturnType<typeof base<any>>]?: ReturnType<
-        typeof base<any>
-    >[K] extends (...args: infer P) => any
+type Logs<T extends (...args: any) => any> = {
+    [K in keyof ReturnType<T>]?: ReturnType<T>[K] extends (
+        ...args: infer P
+    ) => any
         ? (actual: any, not: boolean, ...args: P) => string
         : never
 }
 
-type ExpectReturn<T> = ReturnType<typeof base<T>>
-
 export class LogExpect {
-    protected logs: Logs
+    protected base: Expect
+    protected logs: Logs<typeof this.base<any>>
 
-    constructor(logs: Logs) {
+    constructor(base: Expect, logs: Logs<typeof base<any>>) {
+        this.base = base
         this.logs = logs
     }
 
-    expect<T>(actual: T): ExpectReturn<T> {
-        const baseMatcher = base<T>(
+    expect<T>(actual: T): ReturnType<typeof this.base<T>> {
+        const baseMatcher = this.base<T>(
             actual instanceof LogElement ? actual.getBase() : actual
         )
 
