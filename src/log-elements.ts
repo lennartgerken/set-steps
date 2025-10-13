@@ -190,6 +190,7 @@ export class LogLocator extends LogElement<Locator> {
     }
 
     describe(description: string) {
+        this.base = this.base.describe(description)
         this.usedName = description
         return this
     }
