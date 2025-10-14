@@ -16,22 +16,12 @@ const getStepOutput = (title: TestName): string => {
     return currentSuites.specs[0].tests[0].results[0].steps[0].title
 }
 
-test(TestName.LOCATOR, () => {
-    expect(getStepOutput(TestName.LOCATOR)).toBe(
-        "Klicke Element 'getByRole('button', { name: 'click me' })'."
-    )
+test(TestName.BROWSER, () => {
+    expect(getStepOutput(TestName.BROWSER)).toBe('Öffne neuen Context.')
 })
 
-test(TestName.LOCATOR_DESCRIBE, () => {
-    expect(getStepOutput(TestName.LOCATOR_DESCRIBE)).toBe(
-        "Klicke Element 'Button: click me'."
-    )
-})
-
-test(TestName.LOCATOR_EXPECT, () => {
-    expect(getStepOutput(TestName.LOCATOR_EXPECT)).toBe(
-        "Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet."
-    )
+test(TestName.CONTEXT, () => {
+    expect(getStepOutput(TestName.CONTEXT)).toBe('Öffne neue Page.')
 })
 
 test(TestName.PAGE, () => {
@@ -44,4 +34,28 @@ test(TestName.PAGE, () => {
     const url = `file:///${filePath}`
 
     expect(getStepOutput(TestName.PAGE)).toBe(`Navigiere zu URL '${url}'.`)
+})
+
+test(TestName.LOCATOR, () => {
+    expect(getStepOutput(TestName.LOCATOR)).toBe(
+        "Klicke Element 'getByRole('button', { name: 'click me' })'."
+    )
+})
+
+test(TestName.LOCATOR_DESCRIBE, () => {
+    expect(getStepOutput(TestName.LOCATOR_DESCRIBE)).toBe(
+        "Klicke Element 'Button: click me'."
+    )
+})
+
+test(TestName.LOCATOR_DESCRIBE_CHAIN, () => {
+    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN)).toBe(
+        "Schreibe Wert 'Test' in 'Formular > Textfeld'."
+    )
+})
+
+test(TestName.LOCATOR_EXPECT, () => {
+    expect(getStepOutput(TestName.LOCATOR_EXPECT)).toBe(
+        "Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet."
+    )
 })
