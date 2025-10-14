@@ -55,33 +55,66 @@ export abstract class LogElement<T extends object> {
     protected base: T
     protected usedName: string
     protected logs: AllLogs
+    protected mergeLocatorNames: boolean
 
-    constructor(base: T, name: string, logs: AllLogs) {
+    constructor(
+        base: T,
+        name: string,
+        logs: AllLogs,
+        mergeLocatorNames: boolean
+    ) {
         this.base = base
         this.usedName = name
         this.logs = logs
+        this.mergeLocatorNames = mergeLocatorNames
 
-        const alterReturn = (returnValue: any): any => {
-            if (returnValue instanceof Promise)
-                return returnValue.then((fullfilled) => alterReturn(fullfilled))
-
-            if (Array.isArray(returnValue))
-                return returnValue.map((current: any) => alterReturn(current))
-
+        const alterReturn = (returnValue: unknown): unknown => {
             if (returnValue !== undefined) {
+                if (returnValue instanceof Promise)
+                    return returnValue.then((fullfilled) =>
+                        alterReturn(fullfilled)
+                    )
+
+                if (Array.isArray(returnValue))
+                    return returnValue.map((current: unknown) =>
+                        alterReturn(current)
+                    )
+
                 if (isBrowser(returnValue))
-                    return new LogBrowser(returnValue, logs)
+                    return new LogBrowser(
+                        returnValue,
+                        this.logs,
+                        this.mergeLocatorNames
+                    )
 
                 if (isContext(returnValue))
-                    return new LogContext(returnValue, logs)
+                    return new LogContext(
+                        returnValue,
+                        this.logs,
+                        this.mergeLocatorNames
+                    )
 
-                if (isPage(returnValue)) return new LogPage(returnValue, logs)
+                if (isPage(returnValue))
+                    return new LogPage(
+                        returnValue,
+                        this.logs,
+                        this.mergeLocatorNames
+                    )
 
                 if (isLocator(returnValue))
-                    return new LogLocator(returnValue, logs)
+                    return new LogLocator(
+                        returnValue,
+                        this.logs,
+                        this.mergeLocatorNames,
+                        this instanceof LogLocator ? this.usedName : undefined
+                    )
 
                 if (isRequest(returnValue))
-                    return new LogRequest(returnValue, logs)
+                    return new LogRequest(
+                        returnValue,
+                        this.logs,
+                        this.mergeLocatorNames
+                    )
             }
             return returnValue
         }
@@ -129,7 +162,10 @@ export abstract class LogElement<T extends object> {
         })
     }
 
-    abstract describe(description: string): LogElement<T>
+    describe(description: string) {
+        this.usedName = description
+        return this
+    }
 
     getBase() {
         return this.base
@@ -141,57 +177,58 @@ export abstract class LogElement<T extends object> {
 }
 
 export class LogBrowser extends LogElement<Browser> {
-    constructor(browser: Browser, logs: AllLogs) {
-        super(browser, browser.browserType().name(), logs)
-    }
-
-    describe(description: string) {
-        this.usedName = description
-        return this
+    constructor(browser: Browser, logs: AllLogs, mergeLocatorNames = false) {
+        super(browser, browser.browserType().name(), logs, mergeLocatorNames)
     }
 }
 
 export class LogContext extends LogElement<BrowserContext> {
-    constructor(context: BrowserContext, logs: AllLogs) {
-        super(context, 'context', logs)
-    }
-
-    describe(description: string) {
-        this.usedName = description
-        return this
+    constructor(
+        context: BrowserContext,
+        logs: AllLogs,
+        mergeLocatorNames = false
+    ) {
+        super(context, 'context', logs, mergeLocatorNames)
     }
 }
 
 export class LogRequest extends LogElement<APIRequestContext> {
-    constructor(request: APIRequestContext, logs: AllLogs) {
-        super(request, 'request', logs)
-    }
-
-    describe(description: string) {
-        this.usedName = description
-        return this
+    constructor(
+        request: APIRequestContext,
+        logs: AllLogs,
+        mergeLocatorNames = false
+    ) {
+        super(request, 'request', logs, mergeLocatorNames)
     }
 }
 
 export class LogPage extends LogElement<Page> {
-    constructor(page: Page, logs: AllLogs) {
-        super(page, 'page', logs)
-    }
-
-    describe(description: string) {
-        this.usedName = description
-        return this
+    constructor(page: Page, logs: AllLogs, mergeLocatorNames = false) {
+        super(page, 'page', logs, mergeLocatorNames)
     }
 }
 
 export class LogLocator extends LogElement<Locator> {
-    constructor(locator: Locator, logs: AllLogs) {
-        super(locator, String(locator), logs)
+    protected parentName: string | undefined
+
+    constructor(
+        locator: Locator,
+        logs: AllLogs,
+        mergeLocatorNames = false,
+        parentName?: string
+    ) {
+        super(locator, String(locator), logs, mergeLocatorNames)
+        this.parentName = parentName
+        this.describe(this.usedName)
     }
 
     describe(description: string) {
-        this.base = this.base.describe(description)
-        this.usedName = description
+        const newName =
+            this.parentName && this.mergeLocatorNames
+                ? `${this.parentName} > ${description}`
+                : description
+        this.base = this.base.describe(newName)
+        this.usedName = newName
         return this
     }
 }

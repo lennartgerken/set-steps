@@ -4,17 +4,26 @@ import { LogBrowser, LogExpect } from '@dist/index'
 export const test = baseTest.extend({
     browser: async ({ browser }, use) => {
         await use(
-            new LogBrowser(browser, {
-                pageLogs: {
-                    goto: (_name, url) => `Navigiere zu URL '${url}'.`
+            new LogBrowser(
+                browser,
+                {
+                    browserLogs: {
+                        newContext: () => 'Öffne neuen Context.'
+                    },
+                    contextLogs: {
+                        newPage: () => 'Öffne neue Page.'
+                    },
+                    pageLogs: {
+                        goto: (_name, url) => `Navigiere zu URL '${url}'.`
+                    },
+                    locatorLogs: {
+                        click: (name) => `Klicke Element '${name}'.`,
+                        fill: (name, value) =>
+                            `Schreibe Wert '${value}' in '${name}'.`
+                    }
                 },
-                locatorLogs: {
-                    click: (name) => `Klicke Element '${name}'.`
-                },
-                browserLogs: {
-                    newContext: () => 'Erstelle neuen Context.'
-                }
-            })
+                true
+            )
         )
     }
 })
