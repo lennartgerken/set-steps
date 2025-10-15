@@ -80,6 +80,8 @@ export abstract class LogElement<T extends object> {
                         alterReturn(current)
                     )
 
+                if (returnValue instanceof LogElement) return returnValue
+
                 if (isBrowser(returnValue))
                     return new LogBrowser(
                         returnValue,
@@ -177,6 +179,18 @@ export abstract class LogElement<T extends object> {
 }
 
 export class LogBrowser extends LogElement<Browser> {
+    /**
+     * Creates a new `LogBrowser` instance.
+     *
+     * Wraps the Playwright `Browser` so that each method call can be logged as a custom test step.
+     *
+     * All child objects (`BrowserContext`, `APIRequestContext`, `Page`, and `Locator`)
+     * will also be wrapped as `LogElement` instances.
+     *
+     * @param browser The Playwright `Browser` instance.
+     * @param logs Defines a test step for each method of `Browser`, `BrowserContext`, `APIRequestContext`, `Page`, and `Locator`.
+     * @param mergeLocatorNames When `true`, each newly created `Locator` will have its name merged with its parent locator’s name.
+     */
     constructor(browser: Browser, logs: AllLogs, mergeLocatorNames = false) {
         super(browser, browser.browserType().name(), logs, mergeLocatorNames)
     }

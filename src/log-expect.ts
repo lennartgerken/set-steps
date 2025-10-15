@@ -15,21 +15,26 @@ export class LogExpect {
     protected base: Expect
     protected logs: Logs<typeof this.base<any>>
 
+    /**
+     * Creates a new `LogExpect` instance.
+     *
+     * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
+     *
+     * @param base The base Playwright `expect` function to wrap.
+     * @param logs Defines a test step for each `expect` method.
+     */
     constructor(base: Expect, logs: Logs<typeof base<any>>) {
         this.base = base
         this.logs = logs
     }
 
     expect<T>(actual: T): ReturnType<typeof this.base<T>> {
-        const baseMatcher = this.base<T>(
+        const realActual =
             actual instanceof LogElement ? actual.getBase() : actual
-        )
 
-        const createMatcher = <T>(
-            actual: T,
-            matchers: typeof baseMatcher,
-            not: boolean
-        ) => {
+        const baseMatcher = this.base<T>(realActual)
+
+        const createMatcher = (matchers: typeof baseMatcher, not: boolean) => {
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const parent = this
 
@@ -39,7 +44,6 @@ export class LogExpect {
 
                     if (prop === 'not') {
                         return createMatcher(
-                            actual,
                             original as typeof baseMatcher,
                             true
                         )
@@ -66,6 +70,6 @@ export class LogExpect {
             })
         }
 
-        return createMatcher(actual, baseMatcher, false)
+        return createMatcher(baseMatcher, false)
     }
 }
