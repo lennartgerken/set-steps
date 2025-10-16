@@ -24,7 +24,9 @@ export const getLocation = () => {
             const parsedLine = parseLine(lines[stringIndex])
             if (parsedLine) {
                 return {
-                    file: fileURLToPath(parsedLine.file),
+                    file: /^file:\/\//i.test(parsedLine.file)
+                        ? fileURLToPath(parsedLine.file)
+                        : parsedLine.file,
                     line: parsedLine.line,
                     column: parsedLine.column,
                     functionName: parsedLine.functionName
