@@ -48,4 +48,20 @@ test.describe(() => {
             page.getByRole('heading').describe('Überschrift')
         ).toHaveText('Header')
     })
+
+    test(TestName.LOCATOR_EXPECT_NOT, async ({ page }) => {
+        await expect(
+            page.getByRole('heading').describe('Überschrift')
+        ).not.toHaveText('Test')
+    })
+
+    test(TestName.CUSTOM_EXPECT_LOCATOR, async ({ page }) => {
+        await expect(
+            page.getByRole('button').describe('Button')
+        ).toBeButtonType()
+    })
+
+    test(TestName.CUSTOM_EXPECT_STRING, async () => {
+        expect('test').toBeTestText()
+    })
 })
