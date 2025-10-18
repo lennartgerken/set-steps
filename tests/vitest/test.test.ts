@@ -59,3 +59,21 @@ test(TestName.LOCATOR_EXPECT, () => {
         "Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet."
     )
 })
+
+test(TestName.LOCATOR_EXPECT_NOT, () => {
+    expect(getStepOutput(TestName.LOCATOR_EXPECT_NOT)).toBe(
+        "Prüfe, ob 'Überschrift' nicht den Text 'Test' beinhaltet."
+    )
+})
+
+test(TestName.CUSTOM_EXPECT_LOCATOR, () => {
+    expect(getStepOutput(TestName.CUSTOM_EXPECT_LOCATOR)).toBe(
+        "Prüfe, ob 'Button' den Typ 'button' ist."
+    )
+})
+
+test(TestName.CUSTOM_EXPECT_STRING, () => {
+    expect(getStepOutput(TestName.CUSTOM_EXPECT_STRING)).toBe(
+        "Prüfe, ob 'test' 'test' ist."
+    )
+})
