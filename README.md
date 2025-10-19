@@ -109,3 +109,35 @@ Because we imported our `LogExpect` function as expect, the report output would 
 ```
 Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet.
 ```
+
+## Custom Matchers
+
+You can define custom matchers by passing a third argument to the `LogExpect` constructor.
+This parameter is an object that specifies the matcher functions along with their corresponding test steps:
+
+```ts
+const logExpect = new LogExpect(
+    baseExpect,
+    {
+        toHaveText: (actual, not, expected) =>
+            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
+    },
+    {
+        matchers: {
+            async toBeButtonType(locator: Locator) {
+                ...
+            }
+        },
+        logs: {
+            toBeButtonType: (actual, not) =>
+                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
+        }
+    }
+)
+
+export const expect = <T>(actual: T) => logExpect.expect(actual)
+```
+
+## License
+
+This package is licensed under the [MIT License](./LICENSE).
