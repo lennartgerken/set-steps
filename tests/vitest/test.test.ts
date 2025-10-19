@@ -68,7 +68,7 @@ test(TestName.LOCATOR_EXPECT_NOT, () => {
 
 test(TestName.CUSTOM_EXPECT_LOCATOR, () => {
     expect(getStepOutput(TestName.CUSTOM_EXPECT_LOCATOR)).toBe(
-        "Prüfe, ob 'Button' den Typ 'button' ist."
+        "Prüfe, ob 'Button' den Typ 'button' hat."
     )
 })
 
