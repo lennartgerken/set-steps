@@ -121,6 +121,41 @@ export abstract class LogElement<T extends object> {
             return returnValue
         }
 
+        const alterArgs = (args: unknown[]) => {
+            const seen = new WeakSet<object>()
+
+            return args.map((current): unknown => {
+                const alterArg = (arg: unknown): unknown => {
+                    if (arg instanceof LogElement) return arg.getBase()
+
+                    if (Array.isArray(arg)) {
+                        for (let i = 0; i < arg.length; i++) {
+                            const newValue = alterArg(arg[i])
+                            if (newValue !== arg[i]) arg[i] = newValue
+                        }
+                        return arg
+                    }
+
+                    if (typeof arg === 'object' && arg !== null) {
+                        if (seen.has(arg)) return arg
+                        seen.add(arg)
+
+                        const obj = arg as any
+                        for (const key of Object.keys(obj)) {
+                            const newValue = alterArg(obj[key])
+                            if (newValue !== obj[key]) obj[key] = newValue
+                        }
+
+                        return obj
+                    }
+
+                    return arg
+                }
+
+                return alterArg(current)
+            })
+        }
+
         return new Proxy(this, {
             get(target, prop, receiver) {
                 if (prop in target) return Reflect.get(target, prop, receiver)
@@ -128,6 +163,8 @@ export abstract class LogElement<T extends object> {
 
                 if (typeof original === 'function') {
                     return (...args: any[]) => {
+                        const realArgs = alterArgs(args)
+
                         let logsToUse: any
 
                         if (isBrowser(target.base))
@@ -150,13 +187,15 @@ export abstract class LogElement<T extends object> {
                                 logFunction(target.usedName, args),
                                 () => {
                                     return alterReturn(
-                                        original.apply(target.base, args)
+                                        original.apply(target.base, realArgs)
                                     )
                                 },
                                 { location: getLocation() }
                             )
                         }
-                        return alterReturn(original.apply(target.base, args))
+                        return alterReturn(
+                            original.apply(target.base, realArgs)
+                        )
                     }
                 }
                 return alterReturn(original)

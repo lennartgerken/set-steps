@@ -54,6 +54,18 @@ test(TestName.LOCATOR_DESCRIBE_CHAIN, () => {
     )
 })
 
+test(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER, () => {
+    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER)).toBe(
+        "Klicke Element 'Formular > Filter: Textfeld'."
+    )
+})
+
+test(TestName.LOCATOR_DESCRIBE_CHAIN_OR, () => {
+    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_OR)).toBe(
+        "Klicke Element 'Textfeld > oder Button: click me > erstes Element'."
+    )
+})
+
 test(TestName.LOCATOR_EXPECT, () => {
     expect(getStepOutput(TestName.LOCATOR_EXPECT)).toBe(
         "Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet."

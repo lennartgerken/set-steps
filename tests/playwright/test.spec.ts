@@ -43,6 +43,26 @@ test.describe(() => {
             .fill('Test')
     })
 
+    test(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER, async ({ page }) => {
+        await page
+            .getByRole('form')
+            .describe('Formular')
+            .filter({ has: page.getByLabel('text') })
+            .describe('Filter: Textfeld')
+            .click()
+    })
+
+    test(TestName.LOCATOR_DESCRIBE_CHAIN_OR, async ({ page }) => {
+        await page
+            .getByLabel('text')
+            .describe('Textfeld')
+            .or(page.getByRole('button', { name: 'click me' }))
+            .describe('oder Button: click me')
+            .first()
+            .describe('erstes Element')
+            .click()
+    })
+
     test(TestName.LOCATOR_EXPECT, async ({ page }) => {
         await expect(
             page.getByRole('heading').describe('Überschrift')
