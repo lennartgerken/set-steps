@@ -3,7 +3,7 @@ import {
     expect as baseExpect,
     Locator
 } from '@playwright/test'
-import { LogBrowser, LogExpect } from '@dist/index'
+import { LogBrowser, createLogExpect } from '@dist/index'
 
 export const test = baseTest.extend({
     browser: async ({ browser }, use) => {
@@ -32,7 +32,7 @@ export const test = baseTest.extend({
     }
 })
 
-const logExpect = new LogExpect(
+export const expect = createLogExpect(
     baseExpect,
     {
         toHaveText: (actual, not, expected) =>
@@ -99,5 +99,3 @@ const logExpect = new LogExpect(
         }
     }
 )
-
-export const expect = <T>(actual: T) => logExpect.expect(actual)
