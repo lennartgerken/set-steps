@@ -276,12 +276,15 @@ export class LogLocator extends LogElement<Locator> {
     }
 
     describe(description: string) {
-        const newName =
-            this.parentName && this.mergeLocatorNames
-                ? `${this.parentName} > ${description}`
-                : description
-        this.base = this.base.describe(newName)
-        this.usedName = newName
+        let name = description
+
+        if (this.mergeLocatorNames && this.parentName) {
+            if (description === '') name = this.parentName
+            else name = `${this.parentName} > ${description}`
+        } else if (description === '') name = this.base.toString()
+
+        this.base = this.base.describe(name)
+        this.usedName = name
         return this
     }
 }

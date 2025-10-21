@@ -4,6 +4,7 @@ export enum TestName {
     LOCATOR = 'locator',
     LOCATOR_DESCRIBE = 'locator describe',
     LOCATOR_DESCRIBE_CHAIN = 'locator describe chain',
+    LOCATOR_DESCRIBE_CHAIN_HIDE = 'locator describe chain hide',
     LOCATOR_DESCRIBE_CHAIN_FILTER = 'locator describe chain filter',
     LOCATOR_DESCRIBE_CHAIN_OR = 'locator describe chain or',
     LOCATOR_EXPECT = 'locator expect',

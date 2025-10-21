@@ -43,6 +43,15 @@ test.describe(() => {
             .fill('Test')
     })
 
+    test(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE, async ({ page }) => {
+        await page
+            .getByRole('form')
+            .describe('Formular')
+            .getByLabel('text')
+            .describe('')
+            .fill('Test')
+    })
+
     test(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER, async ({ page }) => {
         await page
             .getByRole('form')
