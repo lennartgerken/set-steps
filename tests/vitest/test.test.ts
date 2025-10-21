@@ -54,6 +54,12 @@ test(TestName.LOCATOR_DESCRIBE_CHAIN, () => {
     )
 })
 
+test(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE, () => {
+    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE)).toBe(
+        "Schreibe Wert 'Test' in 'Formular'."
+    )
+})
+
 test(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER, () => {
     expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER)).toBe(
         "Klicke Element 'Formular > Filter: Textfeld'."
