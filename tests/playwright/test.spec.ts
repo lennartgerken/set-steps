@@ -90,7 +90,13 @@ test.describe(() => {
         ).toBeButtonType()
     })
 
-    test(TestName.CUSTOM_EXPECT_STRING, async () => {
-        expect('test').toBeTestText()
+    test(TestName.CUSTOM_EXPECT_LOCATOR_NOT, async ({ page }) => {
+        await expect(
+            page.getByRole('heading').describe('Überschrift')
+        ).not.toBeButtonType()
     })
+})
+
+test(TestName.CUSTOM_EXPECT_STRING, async () => {
+    expect('test').toBeTestText()
 })

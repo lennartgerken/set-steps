@@ -90,6 +90,12 @@ test(TestName.CUSTOM_EXPECT_LOCATOR, () => {
     )
 })
 
+test(TestName.CUSTOM_EXPECT_LOCATOR_NOT, () => {
+    expect(getStepOutput(TestName.CUSTOM_EXPECT_LOCATOR_NOT)).toBe(
+        "Prüfe, ob 'Überschrift' nicht den Typ 'button' hat."
+    )
+})
+
 test(TestName.CUSTOM_EXPECT_STRING, () => {
     expect(getStepOutput(TestName.CUSTOM_EXPECT_STRING)).toBe(
         "Prüfe, ob 'test' 'test' ist."
