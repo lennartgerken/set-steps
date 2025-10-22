@@ -50,15 +50,6 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     protected base: Expect
     protected logs: Logs<typeof this.base<any>>
 
-    /**
-     * Creates a new `LogExpect` instance.
-     *
-     * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
-     *
-     * @param base The base Playwright `expect` function to wrap.
-     * @param logs Defines a test step for each `expect` method.
-     * @param custom Defines custom matchers and the corresponding test steps.
-     */
     constructor(
         base: Expect,
         logs: Logs<typeof base<any>>,
@@ -141,6 +132,16 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     }
 }
 
+/**
+ * Creates a new `LogExpect` instance.
+ *
+ * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
+ *
+ * @param base The base Playwright `expect` function to wrap.
+ * @param logs Defines a test step for each `expect` method.
+ * @param customMatchers Defines custom matcher functions.
+ * @param customLogs Defines the corresponding test steps for the custom matcher functions.
+ */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function createLogExpect<CustomMatchers extends CustomMatchersBase = {}>(
     base: Expect,
