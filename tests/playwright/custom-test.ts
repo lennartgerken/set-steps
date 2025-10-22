@@ -39,63 +39,61 @@ export const expect = createLogExpect(
             `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
     },
     {
-        matchers: {
-            async toBeButtonType(locator: Locator) {
-                const assertionName = 'toBeButtonType'
-                let pass: boolean
-                let matcherResult: any
-                try {
-                    const expectation = this.isNot
-                        ? baseExpect(locator).not
-                        : baseExpect(locator)
-                    await expectation.toHaveAttribute('type', 'button')
-                    pass = true
-                } catch (e: any) {
-                    matcherResult = e.matcherResult
-                    pass = false
-                }
+        async toBeButtonType(locator: Locator) {
+            const assertionName = 'toBeButtonType'
+            let pass: boolean
+            let matcherResult: any
+            try {
+                const expectation = this.isNot
+                    ? baseExpect(locator).not
+                    : baseExpect(locator)
+                await expectation.toHaveAttribute('type', 'button')
+                pass = true
+            } catch (e: any) {
+                matcherResult = e.matcherResult
+                pass = false
+            }
 
-                if (this.isNot) pass = !pass
+            if (this.isNot) pass = !pass
 
-                return {
-                    message: () => assertionName,
-                    pass,
-                    name: assertionName,
-                    expected: true,
-                    actual: matcherResult?.actual
-                }
-            },
-            toBeTestText(text: string) {
-                const assertionName = 'toBeTestText'
-                let pass: boolean
-                let matcherResult: any
-                try {
-                    const expectation = this.isNot
-                        ? baseExpect(text).not
-                        : baseExpect(text)
-                    expectation.toBe('test')
-                    pass = true
-                } catch (e: any) {
-                    matcherResult = e.matcherResult
-                    pass = false
-                }
-
-                if (this.isNot) pass = !pass
-
-                return {
-                    message: () => assertionName,
-                    pass,
-                    name: assertionName,
-                    expected: true,
-                    actual: matcherResult?.actual
-                }
+            return {
+                message: () => assertionName,
+                pass,
+                name: assertionName,
+                expected: true,
+                actual: matcherResult?.actual
             }
         },
-        logs: {
-            toBeButtonType: (actual, not) =>
-                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`,
-            toBeTestText: (actual, not) =>
-                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}'test' ist.`
+        toBeTestText(text: string) {
+            const assertionName = 'toBeTestText'
+            let pass: boolean
+            let matcherResult: any
+            try {
+                const expectation = this.isNot
+                    ? baseExpect(text).not
+                    : baseExpect(text)
+                expectation.toBe('test')
+                pass = true
+            } catch (e: any) {
+                matcherResult = e.matcherResult
+                pass = false
+            }
+
+            if (this.isNot) pass = !pass
+
+            return {
+                message: () => assertionName,
+                pass,
+                name: assertionName,
+                expected: true,
+                actual: matcherResult?.actual
+            }
         }
+    },
+    {
+        toBeButtonType: (actual, not) =>
+            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`,
+        toBeTestText: (actual, not) =>
+            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}'test' ist.`
     }
 )

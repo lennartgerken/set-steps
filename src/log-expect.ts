@@ -39,11 +39,14 @@ type ExpectReturn<
     E extends (...args: any) => any,
     CM extends Record<string, any>,
     T
-> = ReturnType<E> & ExtractCustomMatchers<CM, T>
+> = Omit<ReturnType<E> & ExtractCustomMatchers<CM, T>, 'not'> & {
+    not: ExpectReturn<E, CM, T>
+}
 
 type CustomMatchersBase = Parameters<Expect['extend']>[0]
 
-export class LogExpect<CustomMatchers extends CustomMatchersBase> {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     protected base: Expect
     protected logs: Logs<typeof this.base<any>>
 
@@ -59,21 +62,18 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase> {
     constructor(
         base: Expect,
         logs: Logs<typeof base<any>>,
-        custom?: {
-            matchers: CustomMatchers
-            logs: CustomLogs<CustomMatchers>
-        }
+        customMatchers?: CustomMatchers,
+        customLogs?: CustomLogs<CustomMatchers>
     ) {
         this.base = base
         this.logs = logs
 
-        if (custom) {
-            this.base = this.base.extend(custom.matchers)
+        if (customMatchers) this.base = this.base.extend(customMatchers)
+        if (customLogs)
             this.logs = {
                 ...this.logs,
-                ...custom.logs
+                ...customLogs
             }
-        }
     }
 
     protected getMatchers<T>(actual: T, soft: boolean, message?: string) {
@@ -141,15 +141,14 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase> {
     }
 }
 
-export function createLogExpect<CustomMatchers extends CustomMatchersBase>(
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export function createLogExpect<CustomMatchers extends CustomMatchersBase = {}>(
     base: Expect,
     logs: Logs<typeof base<any>>,
-    custom?: {
-        matchers: CustomMatchers
-        logs: CustomLogs<CustomMatchers>
-    }
+    customMatchers?: CustomMatchers,
+    customLogs?: CustomLogs<CustomMatchers>
 ) {
-    const logExpect = new LogExpect(base, logs, custom)
+    const logExpect = new LogExpect(base, logs, customMatchers, customLogs)
     const callableExpect = (<T>(actual: T, message?: string) =>
         logExpect.expect(actual, message)) as LogExpect<CustomMatchers> &
         (<T>(
