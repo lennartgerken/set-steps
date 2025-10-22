@@ -35,49 +35,50 @@ type ExtractCustomMatchers<Matchers extends Record<string, any>, Actual> = {
         : never
 }
 
-export class LogExpect<CustomMatchers extends Parameters<Expect['extend']>[0]> {
+type ExpectReturn<
+    E extends (...args: any) => any,
+    CM extends Record<string, any>,
+    T
+> = Omit<ReturnType<E> & ExtractCustomMatchers<CM, T>, 'not'> & {
+    not: ExpectReturn<E, CM, T>
+}
+
+type CustomMatchersBase = Parameters<Expect['extend']>[0]
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     protected base: Expect
     protected logs: Logs<typeof this.base<any>>
 
-    /**
-     * Creates a new `LogExpect` instance.
-     *
-     * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
-     *
-     * @param base The base Playwright `expect` function to wrap.
-     * @param logs Defines a test step for each `expect` method.
-     * @param custom Defines custom matchers and the corresponding test steps.
-     */
     constructor(
         base: Expect,
         logs: Logs<typeof base<any>>,
-        custom?: {
-            matchers: CustomMatchers
-            logs: CustomLogs<CustomMatchers>
-        }
+        customMatchers?: CustomMatchers,
+        customLogs?: CustomLogs<CustomMatchers>
     ) {
         this.base = base
         this.logs = logs
 
-        if (custom) {
-            this.base = this.base.extend(custom.matchers)
+        if (customMatchers) this.base = this.base.extend(customMatchers)
+        if (customLogs)
             this.logs = {
                 ...this.logs,
-                ...custom.logs
+                ...customLogs
             }
-        }
     }
 
-    expect<T>(
-        actual: T
-    ): ReturnType<typeof this.base<T>> &
-        ExtractCustomMatchers<CustomMatchers, T> {
+    protected getMatchers<T>(actual: T, soft: boolean, message?: string) {
         const realActual =
             actual instanceof LogElement ? actual.getBase() : actual
 
-        const baseMatcher = this.base<T>(realActual)
+        const baseMatchers = soft
+            ? this.base.soft<T>(realActual)
+            : this.base<T>(realActual)
 
-        const createMatcher = (matchers: typeof baseMatcher, not: boolean) => {
+        const createMatchers = (
+            matchers: typeof baseMatchers,
+            not: boolean
+        ) => {
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const parent = this
 
@@ -86,8 +87,8 @@ export class LogExpect<CustomMatchers extends Parameters<Expect['extend']>[0]> {
                     const original = Reflect.get(target, prop, target)
 
                     if (prop === 'not') {
-                        return createMatcher(
-                            original as typeof baseMatcher,
+                        return createMatchers(
+                            original as typeof baseMatchers,
                             true
                         )
                     }
@@ -95,9 +96,9 @@ export class LogExpect<CustomMatchers extends Parameters<Expect['extend']>[0]> {
                     if (typeof original === 'function') {
                         return (...args: any[]) => {
                             const logFunction = (parent.logs as any)[prop]
-                            if (logFunction !== undefined) {
+                            if (message || logFunction) {
                                 return test.step(
-                                    logFunction(actual, not, args),
+                                    message || logFunction(actual, not, args),
                                     () => {
                                         return original.apply(target, args)
                                     },
@@ -113,6 +114,48 @@ export class LogExpect<CustomMatchers extends Parameters<Expect['extend']>[0]> {
             })
         }
 
-        return createMatcher(baseMatcher, false) as any
+        return createMatchers(baseMatchers, false) as any
     }
+
+    soft<T>(
+        actual: T,
+        message?: string
+    ): ExpectReturn<typeof this.base<T>, CustomMatchers, T> {
+        return this.getMatchers(actual, true, message)
+    }
+
+    expect<T>(
+        actual: T,
+        message?: string
+    ): ExpectReturn<typeof this.base<T>, CustomMatchers, T> {
+        return this.getMatchers(actual, false, message)
+    }
+}
+
+/**
+ * Creates a new `LogExpect` instance.
+ *
+ * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
+ *
+ * @param base The base Playwright `expect` function to wrap.
+ * @param logs Defines a test step for each `expect` method.
+ * @param customMatchers Defines custom matcher functions.
+ * @param customLogs Defines the corresponding test steps for the custom matcher functions.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export function createLogExpect<CustomMatchers extends CustomMatchersBase = {}>(
+    base: Expect,
+    logs: Logs<typeof base<any>>,
+    customMatchers?: CustomMatchers,
+    customLogs?: CustomLogs<CustomMatchers>
+) {
+    const logExpect = new LogExpect(base, logs, customMatchers, customLogs)
+    const callableExpect = (<T>(actual: T, message?: string) =>
+        logExpect.expect(actual, message)) as LogExpect<CustomMatchers> &
+        (<T>(
+            actual: T,
+            message?: string
+        ) => ExpectReturn<typeof base<T>, CustomMatchers, T>)
+    Object.setPrototypeOf(callableExpect, logExpect)
+    return callableExpect
 }
