@@ -1,7 +1,8 @@
 import {
     test as baseTest,
     expect as baseExpect,
-    Locator
+    Locator,
+    ExpectMatcherState
 } from '@playwright/test'
 import { LogBrowser, createLogExpect } from '@dist/index'
 
@@ -39,7 +40,7 @@ export const expect = createLogExpect(
             `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
     },
     {
-        async toBeButtonType(locator: Locator) {
+        async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
             const assertionName = 'toBeButtonType'
             let pass: boolean
             let matcherResult: any
@@ -64,7 +65,7 @@ export const expect = createLogExpect(
                 actual: matcherResult?.actual
             }
         },
-        toBeTestText(text: string) {
+        toBeTestText(this: ExpectMatcherState, text: string) {
             const assertionName = 'toBeTestText'
             let pass: boolean
             let matcherResult: any
