@@ -24,7 +24,7 @@ The simplest way to integrate `LogBrowser` is by overriding the built-in `browse
 
 ```ts
 import { test as baseTest, expect as baseExpect } from '@playwright/test'
-import { LogBrowser, LogExpect } from 'set-steps'
+import { LogBrowser, createLogExpect } from 'set-steps'
 
 export const test = baseTest.extend({
     browser: async ({ browser }, use) => {
@@ -59,12 +59,10 @@ In this example, test steps are localized in German. Each step function receives
 As a second step, wrap Playwright’s `expect` with a `LogExpect` instance. This lets you define custom test steps for each assertion:
 
 ```ts
-const logExpect = new LogExpect(baseExpect, {
+export const expect = createLogExpect(baseExpect, {
     toHaveText: (actual, not, expected) =>
         `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
 })
-
-export const expect = <T>(actual: T) => logExpect.expect(actual)
 ```
 
 Here we define a custom test step for `toHaveText`.
@@ -104,7 +102,7 @@ await expect(page.getByRole('heading').describe('Überschrift')).toHaveText(
 )
 ```
 
-Because we imported our `LogExpect` function as expect, the report output would look like this:
+Because we imported our `LogExpect` as expect, the report output would look like this:
 
 ```
 Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet.
@@ -112,30 +110,26 @@ Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet.
 
 ## Custom Matchers
 
-You can define custom matchers by passing a third argument to the `LogExpect` constructor.
-This parameter is an object that specifies the matcher functions along with their corresponding test steps:
+You can define custom matchers by passing them as a third argument to the `createLogExpect` function.
+A fourth argument specifies the corresponding test steps:
 
 ```ts
-const logExpect = new LogExpect(
+export const expect = createLogExpect(
     baseExpect,
     {
         toHaveText: (actual, not, expected) =>
             `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
     },
     {
-        matchers: {
-            async toBeButtonType(locator: Locator) {
-                ...
-            }
+        async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
+            ...
         },
-        logs: {
-            toBeButtonType: (actual, not) =>
-                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
-        }
+    },
+    {
+        toBeButtonType: (actual, not) =>
+            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`,
     }
 )
-
-export const expect = <T>(actual: T) => logExpect.expect(actual)
 ```
 
 ## License
