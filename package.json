@@ -36,6 +36,7 @@
         "pretty": "prettier . --write",
         "pretty-check": "prettier . --check",
         "lint": "eslint .",
+        "test-type-check": "npx tsc -p ./tests/playwright/tsconfig.json --noEmit",
         "test": "vitest run",
         "build": "rollup -c"
     },
