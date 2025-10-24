@@ -184,7 +184,7 @@ export abstract class LogElement<T extends object> {
 
                         if (logFunction !== undefined) {
                             return test.step(
-                                logFunction(target.usedName, args),
+                                logFunction(target.usedName, ...args),
                                 () => {
                                     return alterReturn(
                                         original.apply(target.base, realArgs)
