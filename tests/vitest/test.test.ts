@@ -4,24 +4,27 @@ import { TestName } from '../playwright/test-names'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
-const getStepOutput = (title: TestName): string => {
-    const results = JSON.parse(
-        execSync(`npx playwright test --grep '${title}'`).toString()
-    )
+const tests = new Map<string, string>()
 
-    let currentSuites = results.suites[0]
-    while (currentSuites.suites && currentSuites.suites[0])
-        currentSuites = currentSuites.suites[0]
+test.beforeAll(() => {
+    const getSpecs = (suites: any) => {
+        if (suites.specs) {
+            suites.specs.forEach((spec: any) => {
+                tests.set(spec.title, spec.tests[0].results[0].steps[0].title)
+            })
+        }
+        if (suites.suites) getSpecs(suites.suites[0])
+    }
 
-    return currentSuites.specs[0].tests[0].results[0].steps[0].title
-}
+    getSpecs(JSON.parse(execSync(`npx playwright test`).toString()).suites[0])
+})
 
 test(TestName.BROWSER, () => {
-    expect(getStepOutput(TestName.BROWSER)).toBe('Öffne neuen Context.')
+    expect(tests.get(TestName.BROWSER)).toBe('Öffne neuen Context.')
 })
 
 test(TestName.CONTEXT, () => {
-    expect(getStepOutput(TestName.CONTEXT)).toBe('Öffne neue Page.')
+    expect(tests.get(TestName.CONTEXT)).toBe('Öffne neue Page.')
 })
 
 test(TestName.PAGE, () => {
@@ -33,71 +36,83 @@ test(TestName.PAGE, () => {
     )
     const url = `file:///${filePath}`
 
-    expect(getStepOutput(TestName.PAGE)).toBe(`Navigiere zu URL '${url}'.`)
+    expect(tests.get(TestName.PAGE)).toBe(`Navigiere zu URL '${url}'.`)
 })
 
 test(TestName.LOCATOR, () => {
-    expect(getStepOutput(TestName.LOCATOR)).toBe(
+    expect(tests.get(TestName.LOCATOR)).toBe(
         "Klicke Element 'getByRole('button', { name: 'click me' })'."
     )
 })
 
 test(TestName.LOCATOR_DESCRIBE, () => {
-    expect(getStepOutput(TestName.LOCATOR_DESCRIBE)).toBe(
+    expect(tests.get(TestName.LOCATOR_DESCRIBE)).toBe(
         "Klicke Element 'Button: click me'."
     )
 })
 
+test(TestName.LOCATOR_DESCRIBE_OPTIONS, () => {
+    expect(tests.get(TestName.LOCATOR_DESCRIBE_OPTIONS)).toBe(
+        "Klicke 2 mal Element 'Button: click me'."
+    )
+})
+
 test(TestName.LOCATOR_DESCRIBE_CHAIN, () => {
-    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN)).toBe(
+    expect(tests.get(TestName.LOCATOR_DESCRIBE_CHAIN)).toBe(
         "Schreibe Wert 'Test' in 'Formular > Textfeld'."
     )
 })
 
 test(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE, () => {
-    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE)).toBe(
+    expect(tests.get(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE)).toBe(
         "Schreibe Wert 'Test' in 'Formular'."
     )
 })
 
 test(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER, () => {
-    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER)).toBe(
+    expect(tests.get(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER)).toBe(
         "Klicke Element 'Formular > Filter: Textfeld'."
     )
 })
 
 test(TestName.LOCATOR_DESCRIBE_CHAIN_OR, () => {
-    expect(getStepOutput(TestName.LOCATOR_DESCRIBE_CHAIN_OR)).toBe(
+    expect(tests.get(TestName.LOCATOR_DESCRIBE_CHAIN_OR)).toBe(
         "Klicke Element 'Textfeld > oder Button: click me > erstes Element'."
     )
 })
 
 test(TestName.LOCATOR_EXPECT, () => {
-    expect(getStepOutput(TestName.LOCATOR_EXPECT)).toBe(
+    expect(tests.get(TestName.LOCATOR_EXPECT)).toBe(
         "Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet."
     )
 })
 
+test(TestName.LOCATOR_EXPECT_OPTIONS, () => {
+    expect(tests.get(TestName.LOCATOR_EXPECT_OPTIONS)).toBe(
+        "Prüfe, ob 'Deaktiviertes Input' nicht editierbar ist."
+    )
+})
+
 test(TestName.LOCATOR_EXPECT_NOT, () => {
-    expect(getStepOutput(TestName.LOCATOR_EXPECT_NOT)).toBe(
+    expect(tests.get(TestName.LOCATOR_EXPECT_NOT)).toBe(
         "Prüfe, ob 'Überschrift' nicht den Text 'Test' beinhaltet."
     )
 })
 
 test(TestName.CUSTOM_EXPECT_LOCATOR, () => {
-    expect(getStepOutput(TestName.CUSTOM_EXPECT_LOCATOR)).toBe(
+    expect(tests.get(TestName.CUSTOM_EXPECT_LOCATOR)).toBe(
         "Prüfe, ob 'Button' den Typ 'button' hat."
     )
 })
 
 test(TestName.CUSTOM_EXPECT_LOCATOR_NOT, () => {
-    expect(getStepOutput(TestName.CUSTOM_EXPECT_LOCATOR_NOT)).toBe(
+    expect(tests.get(TestName.CUSTOM_EXPECT_LOCATOR_NOT)).toBe(
         "Prüfe, ob 'Überschrift' nicht den Typ 'button' hat."
     )
 })
 
 test(TestName.CUSTOM_EXPECT_STRING, () => {
-    expect(getStepOutput(TestName.CUSTOM_EXPECT_STRING)).toBe(
+    expect(tests.get(TestName.CUSTOM_EXPECT_STRING)).toBe(
         "Prüfe, ob 'test' 'test' ist."
     )
 })

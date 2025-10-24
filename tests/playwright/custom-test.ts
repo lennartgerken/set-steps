@@ -22,7 +22,8 @@ export const test = baseTest.extend({
                         goto: (_name, url) => `Navigiere zu URL '${url}'.`
                     },
                     locatorLogs: {
-                        click: (name) => `Klicke Element '${name}'.`,
+                        click: (name, options) =>
+                            `Klicke${options && options.clickCount ? ` ${options.clickCount} mal ` : ' '}Element '${name}'.`,
                         fill: (name, value) =>
                             `Schreibe Wert '${value}' in '${name}'.`
                     }
@@ -37,7 +38,11 @@ export const expect = createLogExpect(
     baseExpect,
     {
         toHaveText: (actual, not, expected) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
+            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`,
+        toBeEditable: (actual, not, options) => {
+            const editable = !options || options.editable
+            return `Prüfe, ob '${actual}'${(not && editable) || (!not && !editable) ? ' nicht ' : ' '}editierbar ist.`
+        }
     },
     {
         async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
