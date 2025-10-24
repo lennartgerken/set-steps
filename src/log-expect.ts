@@ -98,7 +98,8 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
                             const logFunction = (parent.logs as any)[prop]
                             if (message || logFunction) {
                                 return test.step(
-                                    message || logFunction(actual, not, args),
+                                    message ||
+                                        logFunction(actual, not, ...args),
                                     () => {
                                         return original.apply(target, args)
                                     },

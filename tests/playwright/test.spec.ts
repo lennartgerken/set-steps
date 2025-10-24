@@ -34,11 +34,18 @@ test.describe(() => {
             .click()
     })
 
+    test(TestName.LOCATOR_DESCRIBE_OPTIONS, async ({ page }) => {
+        await page
+            .getByRole('button', { name: 'click me' })
+            .describe('Button: click me')
+            .click({ clickCount: 2 })
+    })
+
     test(TestName.LOCATOR_DESCRIBE_CHAIN, async ({ page }) => {
         await page
             .getByRole('form')
             .describe('Formular')
-            .getByLabel('text')
+            .getByLabel('text-enabled')
             .describe('Textfeld')
             .fill('Test')
     })
@@ -47,7 +54,7 @@ test.describe(() => {
         await page
             .getByRole('form')
             .describe('Formular')
-            .getByLabel('text')
+            .getByLabel('text-enabled')
             .describe('')
             .fill('Test')
     })
@@ -56,14 +63,14 @@ test.describe(() => {
         await page
             .getByRole('form')
             .describe('Formular')
-            .filter({ has: page.getByLabel('text') })
+            .filter({ has: page.getByLabel('text-enabled') })
             .describe('Filter: Textfeld')
             .click()
     })
 
     test(TestName.LOCATOR_DESCRIBE_CHAIN_OR, async ({ page }) => {
         await page
-            .getByLabel('text')
+            .getByLabel('text-enabled')
             .describe('Textfeld')
             .or(page.getByRole('button', { name: 'click me' }))
             .describe('oder Button: click me')
@@ -76,6 +83,12 @@ test.describe(() => {
         await expect(
             page.getByRole('heading').describe('Überschrift')
         ).toHaveText('Header')
+    })
+
+    test(TestName.LOCATOR_EXPECT_OPTIONS, async ({ page }) => {
+        await expect(
+            page.getByLabel('text-disabled').describe('Deaktiviertes Input')
+        ).toBeEditable({ editable: false })
     })
 
     test(TestName.LOCATOR_EXPECT_NOT, async ({ page }) => {
