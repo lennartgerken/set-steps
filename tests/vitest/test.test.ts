@@ -39,12 +39,6 @@ test(TestName.PAGE, () => {
     expect(tests.get(TestName.PAGE)).toBe(`Navigiere zu URL '${url}'.`)
 })
 
-test(TestName.LOCATOR, () => {
-    expect(tests.get(TestName.LOCATOR)).toBe(
-        "Klicke Element 'getByRole('button', { name: 'click me' })'."
-    )
-})
-
 test(TestName.LOCATOR_DESCRIBE, () => {
     expect(tests.get(TestName.LOCATOR_DESCRIBE)).toBe(
         "Klicke Element 'Button: click me'."
@@ -65,7 +59,7 @@ test(TestName.LOCATOR_DESCRIBE_CHAIN, () => {
 
 test(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE, () => {
     expect(tests.get(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE)).toBe(
-        "Schreibe Wert 'Test' in 'Formular'."
+        "Schreibe Wert 'Test' in 'Text in Formular'."
     )
 })
 
@@ -78,6 +72,18 @@ test(TestName.LOCATOR_DESCRIBE_CHAIN_FILTER, () => {
 test(TestName.LOCATOR_DESCRIBE_CHAIN_OR, () => {
     expect(tests.get(TestName.LOCATOR_DESCRIBE_CHAIN_OR)).toBe(
         "Klicke Element 'Textfeld > oder Button: click me > erstes Element'."
+    )
+})
+
+test(TestName.LOCATOR_NO_CHAIN, () => {
+    expect(tests.get(TestName.LOCATOR_NO_CHAIN)).toBe(
+        "Schreibe Wert 'Test' in 'getByRole('form').getByLabel('text-enabled')'."
+    )
+})
+
+test(TestName.LOCATOR_DESCRIBE_NO_CHAIN, () => {
+    expect(tests.get(TestName.LOCATOR_DESCRIBE_NO_CHAIN)).toBe(
+        "Schreibe Wert 'Test' in 'Textfeld'."
     )
 })
 

@@ -2,35 +2,43 @@ import {
     test as baseTest,
     expect as baseExpect,
     Locator,
-    ExpectMatcherState
+    ExpectMatcherState,
+    Browser
 } from '@playwright/test'
 import { LogBrowser, createLogExpect } from '@dist/index'
 
+const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
+    return new LogBrowser(
+        browser,
+        {
+            browserLogs: {
+                newContext: () => 'Öffne neuen Context.'
+            },
+            contextLogs: {
+                newPage: () => 'Öffne neue Page.'
+            },
+            pageLogs: {
+                goto: (_name, url) => `Navigiere zu URL '${url}'.`
+            },
+            locatorLogs: {
+                click: (name, options) =>
+                    `Klicke${options && options.clickCount ? ` ${options.clickCount} mal ` : ' '}Element '${name}'.`,
+                fill: (name, value) => `Schreibe Wert '${value}' in '${name}'.`
+            }
+        },
+        chainLocatorNames
+    )
+}
+
 export const test = baseTest.extend({
     browser: async ({ browser }, use) => {
-        await use(
-            new LogBrowser(
-                browser,
-                {
-                    browserLogs: {
-                        newContext: () => 'Öffne neuen Context.'
-                    },
-                    contextLogs: {
-                        newPage: () => 'Öffne neue Page.'
-                    },
-                    pageLogs: {
-                        goto: (_name, url) => `Navigiere zu URL '${url}'.`
-                    },
-                    locatorLogs: {
-                        click: (name, options) =>
-                            `Klicke${options && options.clickCount ? ` ${options.clickCount} mal ` : ' '}Element '${name}'.`,
-                        fill: (name, value) =>
-                            `Schreibe Wert '${value}' in '${name}'.`
-                    }
-                },
-                true
-            )
-        )
+        await use(createLogBrowser(browser, true))
+    }
+})
+
+export const testNoChain = baseTest.extend({
+    browser: async ({ browser }, use) => {
+        await use(createLogBrowser(browser, false))
     }
 })
 

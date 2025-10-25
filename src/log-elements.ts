@@ -55,18 +55,18 @@ export abstract class LogElement<T extends object> {
     protected base: T
     protected usedName: string
     protected logs: AllLogs
-    protected mergeLocatorNames: boolean
+    protected chainLocatorNames: boolean
 
     constructor(
         base: T,
         name: string,
         logs: AllLogs,
-        mergeLocatorNames: boolean
+        chainLocatorNames: boolean
     ) {
         this.base = base
         this.usedName = name
         this.logs = logs
-        this.mergeLocatorNames = mergeLocatorNames
+        this.chainLocatorNames = chainLocatorNames
 
         const alterReturn = (returnValue: unknown): unknown => {
             if (returnValue !== undefined) {
@@ -86,28 +86,28 @@ export abstract class LogElement<T extends object> {
                     return new LogBrowser(
                         returnValue,
                         this.logs,
-                        this.mergeLocatorNames
+                        this.chainLocatorNames
                     )
 
                 if (isContext(returnValue))
                     return new LogContext(
                         returnValue,
                         this.logs,
-                        this.mergeLocatorNames
+                        this.chainLocatorNames
                     )
 
                 if (isPage(returnValue))
                     return new LogPage(
                         returnValue,
                         this.logs,
-                        this.mergeLocatorNames
+                        this.chainLocatorNames
                     )
 
                 if (isLocator(returnValue))
                     return new LogLocator(
                         returnValue,
                         this.logs,
-                        this.mergeLocatorNames,
+                        this.chainLocatorNames,
                         this instanceof LogLocator ? this.usedName : undefined
                     )
 
@@ -115,7 +115,7 @@ export abstract class LogElement<T extends object> {
                     return new LogRequest(
                         returnValue,
                         this.logs,
-                        this.mergeLocatorNames
+                        this.chainLocatorNames
                     )
             }
             return returnValue
@@ -228,10 +228,10 @@ export class LogBrowser extends LogElement<Browser> {
      *
      * @param browser The Playwright `Browser` instance.
      * @param logs Defines a test step for each method of `Browser`, `BrowserContext`, `APIRequestContext`, `Page`, and `Locator`.
-     * @param mergeLocatorNames When `true`, each newly created `Locator` will have its name merged with its parent locator’s name.
+     * @param chainLocatorNames When `true`, each newly created `Locator` will have its name merged with its parent locator’s name.
      */
-    constructor(browser: Browser, logs: AllLogs, mergeLocatorNames = false) {
-        super(browser, browser.browserType().name(), logs, mergeLocatorNames)
+    constructor(browser: Browser, logs: AllLogs, chainLocatorNames = false) {
+        super(browser, browser.browserType().name(), logs, chainLocatorNames)
     }
 }
 
@@ -239,9 +239,9 @@ export class LogContext extends LogElement<BrowserContext> {
     constructor(
         context: BrowserContext,
         logs: AllLogs,
-        mergeLocatorNames = false
+        chainLocatorNames = false
     ) {
-        super(context, 'context', logs, mergeLocatorNames)
+        super(context, 'context', logs, chainLocatorNames)
     }
 }
 
@@ -249,15 +249,15 @@ export class LogRequest extends LogElement<APIRequestContext> {
     constructor(
         request: APIRequestContext,
         logs: AllLogs,
-        mergeLocatorNames = false
+        chainLocatorNames = false
     ) {
-        super(request, 'request', logs, mergeLocatorNames)
+        super(request, 'request', logs, chainLocatorNames)
     }
 }
 
 export class LogPage extends LogElement<Page> {
-    constructor(page: Page, logs: AllLogs, mergeLocatorNames = false) {
-        super(page, 'page', logs, mergeLocatorNames)
+    constructor(page: Page, logs: AllLogs, chainLocatorNames = false) {
+        super(page, 'page', logs, chainLocatorNames)
     }
 }
 
@@ -267,20 +267,23 @@ export class LogLocator extends LogElement<Locator> {
     constructor(
         locator: Locator,
         logs: AllLogs,
-        mergeLocatorNames = false,
+        chainLocatorNames = false,
         parentName?: string
     ) {
-        super(locator, String(locator), logs, mergeLocatorNames)
+        super(locator, String(locator), logs, chainLocatorNames)
         this.parentName = parentName
-        this.describe(this.usedName)
+        if (chainLocatorNames) this.describe('')
+        else this.describe(this.usedName)
     }
 
     describe(description: string) {
         let name = description
 
-        if (this.mergeLocatorNames && this.parentName) {
-            if (description === '') name = this.parentName
-            else name = `${this.parentName} > ${description}`
+        if (this.chainLocatorNames) {
+            if (this.parentName) {
+                if (description === '') name = this.parentName
+                else name = `${this.parentName} > ${description}`
+            }
         } else if (description === '') name = this.base.toString()
 
         this.base = this.base.describe(name)
