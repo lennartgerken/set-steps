@@ -1,5 +1,5 @@
 import { dirname, join } from 'path'
-import { test, expect } from './custom-test'
+import { test, testNoChain, expect } from './custom-test'
 import { fileURLToPath } from 'url'
 import { TestName } from './test-names'
 
@@ -21,10 +21,6 @@ test(TestName.PAGE, async ({ page }) => {
 test.describe(() => {
     test.beforeEach(async ({ page }) => {
         await page.goto(url)
-    })
-
-    test(TestName.LOCATOR, async ({ page }) => {
-        await page.getByRole('button', { name: 'click me' }).click()
     })
 
     test(TestName.LOCATOR_DESCRIBE, async ({ page }) => {
@@ -53,9 +49,8 @@ test.describe(() => {
     test(TestName.LOCATOR_DESCRIBE_CHAIN_HIDE, async ({ page }) => {
         await page
             .getByRole('form')
-            .describe('Formular')
             .getByLabel('text-enabled')
-            .describe('')
+            .describe('Text in Formular')
             .fill('Test')
     })
 
@@ -77,6 +72,19 @@ test.describe(() => {
             .first()
             .describe('erstes Element')
             .click()
+    })
+
+    testNoChain(TestName.LOCATOR_NO_CHAIN, async ({ page }) => {
+        await page.getByRole('form').getByLabel('text-enabled').fill('Test')
+    })
+
+    testNoChain(TestName.LOCATOR_DESCRIBE_NO_CHAIN, async ({ page }) => {
+        await page
+            .getByRole('form')
+            .describe('Formular')
+            .getByLabel('text-enabled')
+            .describe('Textfeld')
+            .fill('Test')
     })
 
     test(TestName.LOCATOR_EXPECT, async ({ page }) => {
