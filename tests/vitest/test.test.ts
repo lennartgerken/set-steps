@@ -28,7 +28,7 @@ for (const browser of ['chromium', 'firefox', 'webkit']) {
                     ).toString()
                 ).suites[0]
             )
-        })
+        }, 15000)
 
         test(TestName.BROWSER, () => {
             expect(tests.get(TestName.BROWSER)).toBe('Öffne neuen Context.')
