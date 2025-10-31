@@ -23,26 +23,23 @@ type AllLogs = {
 }
 
 function isBrowser(value: unknown): value is Browser {
-    return (value as Browser).newContext !== undefined
+    return (value as Browser).newContext != null
 }
 
 function isContext(value: unknown): value is BrowserContext {
-    return (value as BrowserContext).addCookies !== undefined
+    return (value as BrowserContext).addCookies != null
 }
 
 function isPage(value: unknown): value is Page {
-    return (value as Page).goto !== undefined
+    return (value as Page).goto != null
 }
 
 function isRequest(value: unknown): value is APIRequestContext {
-    return (value as APIRequestContext).fetch !== undefined
+    return (value as APIRequestContext).fetch != null
 }
 
 function isLocator(value: unknown): value is Locator {
-    return (
-        (value as Locator).fill !== undefined &&
-        (value as Page).goto === undefined
-    )
+    return (value as Locator).fill != null && (value as Page).goto == null
 }
 
 export interface LogBrowser extends Browser {}
@@ -69,7 +66,7 @@ export abstract class LogElement<T extends object> {
         this.chainLocatorNames = chainLocatorNames
 
         const alterReturn = (returnValue: unknown): unknown => {
-            if (returnValue !== undefined) {
+            if (returnValue != null) {
                 if (returnValue instanceof Promise)
                     return returnValue.then((fullfilled) =>
                         alterReturn(fullfilled)
@@ -182,7 +179,7 @@ export abstract class LogElement<T extends object> {
                             ? logsToUse[prop]
                             : undefined
 
-                        if (logFunction !== undefined) {
+                        if (logFunction != null) {
                             return test.step(
                                 logFunction(target.usedName, ...args),
                                 () => {
