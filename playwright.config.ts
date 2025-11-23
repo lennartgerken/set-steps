@@ -8,6 +8,12 @@ export default defineConfig({
     expect: {
         timeout: 5000
     },
+    webServer: {
+        command: 'npm run serve-test',
+        port: 3000,
+        reuseExistingServer: !process.env.CI
+    },
+    use: { baseURL: 'http://localhost:3000' },
     projects: [
         {
             name: 'chromium',

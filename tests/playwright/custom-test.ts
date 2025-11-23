@@ -24,6 +24,9 @@ const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
                 click: (name, options) =>
                     `Klicke${options && options.clickCount ? ` ${options.clickCount} mal ` : ' '}Element '${name}'.`,
                 fill: (name, value) => `Schreibe Wert '${value}' in '${name}'.`
+            },
+            requestLogs: {
+                get: (_name, url) => `Sende GET Request an '${url}'.`
             }
         },
         chainLocatorNames
@@ -33,6 +36,9 @@ const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
 export const test = baseTest.extend({
     browser: async ({ browser }, use) => {
         await use(createLogBrowser(browser, true))
+    },
+    request: async ({ context }, use) => {
+        await use(context.request)
     }
 })
 
