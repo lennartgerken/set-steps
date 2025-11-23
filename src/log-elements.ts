@@ -23,23 +23,51 @@ type AllLogs = {
 }
 
 function isBrowser(value: unknown): value is Browser {
-    return (value as Browser).newContext != null
+    return (
+        typeof value === 'object' &&
+        value != null &&
+        typeof (value as Browser).newContext === 'function' &&
+        typeof (value as Browser).close === 'function'
+    )
 }
 
 function isContext(value: unknown): value is BrowserContext {
-    return (value as BrowserContext).addCookies != null
+    return (
+        typeof value === 'object' &&
+        value != null &&
+        typeof (value as BrowserContext).addCookies === 'function' &&
+        typeof (value as BrowserContext).newPage === 'function'
+    )
 }
 
 function isPage(value: unknown): value is Page {
-    return (value as Page).goto != null
+    return (
+        typeof value === 'object' &&
+        value != null &&
+        typeof (value as Page).goto === 'function' &&
+        typeof (value as Page).locator === 'function'
+    )
 }
 
 function isRequest(value: unknown): value is APIRequestContext {
-    return (value as APIRequestContext).fetch != null
+    return (
+        typeof value === 'object' &&
+        value != null &&
+        typeof (value as APIRequestContext).fetch === 'function' &&
+        typeof (value as APIRequestContext).get === 'function' &&
+        typeof (value as APIRequestContext).post === 'function'
+    )
 }
 
 function isLocator(value: unknown): value is Locator {
-    return (value as Locator).fill != null && (value as Page).goto == null
+    return (
+        typeof value === 'object' &&
+        value != null &&
+        typeof (value as Locator).locator === 'function' &&
+        typeof (value as Locator).fill === 'function' &&
+        typeof (value as Locator).click === 'function' &&
+        (value as Page).goto == null
+    )
 }
 
 export interface LogBrowser extends Browser {}

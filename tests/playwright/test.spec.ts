@@ -1,10 +1,7 @@
-import { dirname, join } from 'path'
 import { test, testNoChain, expect } from './custom-test'
-import { fileURLToPath } from 'url'
 import { TestName } from './test-names'
 
-const filePath = join(dirname(fileURLToPath(import.meta.url)), 'test.html')
-const url = `file:///${filePath}`
+const url = '/test.html'
 
 test(TestName.BROWSER, async ({ browser }) => {
     await browser.newContext()
@@ -16,6 +13,10 @@ test(TestName.CONTEXT, async ({ context }) => {
 
 test(TestName.PAGE, async ({ page }) => {
     await page.goto(url)
+})
+
+test(TestName.REQUEST, async ({ request }) => {
+    await request.get(url)
 })
 
 test.describe(() => {

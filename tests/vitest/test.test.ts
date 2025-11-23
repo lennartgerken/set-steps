@@ -1,8 +1,8 @@
 import { execSync } from 'child_process'
 import { expect, test, describe } from 'vitest'
 import { TestName } from '../playwright/test-names'
-import { dirname, join } from 'path'
-import { fileURLToPath } from 'url'
+
+const url = '/test.html'
 
 for (const browser of ['chromium', 'firefox', 'webkit']) {
     describe(browser, () => {
@@ -39,15 +39,13 @@ for (const browser of ['chromium', 'firefox', 'webkit']) {
         })
 
         test(TestName.PAGE, () => {
-            const filePath = join(
-                dirname(fileURLToPath(import.meta.url)),
-                '..',
-                'playwright',
-                'test.html'
-            )
-            const url = `file:///${filePath}`
-
             expect(tests.get(TestName.PAGE)).toBe(`Navigiere zu URL '${url}'.`)
+        })
+
+        test(TestName.REQUEST, () => {
+            expect(tests.get(TestName.REQUEST)).toBe(
+                `Sende GET Request an '${url}'.`
+            )
         })
 
         test(TestName.LOCATOR_DESCRIBE, () => {

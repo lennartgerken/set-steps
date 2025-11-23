@@ -16,5 +16,6 @@ export enum TestName {
     CUSTOM_EXPECT_LOCATOR = 'custom expect locator',
     CUSTOM_EXPECT_LOCATOR_NOT = 'custom expect locator not',
     CUSTOM_EXPECT_STRING = 'custom expect string',
-    PAGE = 'page'
+    PAGE = 'page',
+    REQUEST = 'request'
 }
