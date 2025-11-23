@@ -1,6 +1,6 @@
 {
     "name": "set-steps",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "license": "MIT",
     "author": "Lennart Gerken",
     "description": "Automatically inject test steps into Playwright actions.",
@@ -15,7 +15,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/lennartgerken/set-steps.git"
+        "url": "git+https://github.com/lennartgerken/set-steps.git"
     },
     "bugs": {
         "url": "https://github.com/lennartgerken/set-steps/issues"
@@ -36,8 +36,8 @@
         "pretty": "prettier . --write",
         "pretty-check": "prettier . --check",
         "lint": "eslint .",
-        "test-type-check": "npx tsc -p ./tests/playwright/tsconfig.json --noEmit",
         "build": "rollup -c",
+        "test-type-check": "npx tsc -p ./tests/playwright/tsconfig.json --noEmit",
         "serve-test": "serve tests/playwright/public -l 3000",
         "test": "vitest run"
     },
@@ -45,15 +45,15 @@
         "@playwright/test": "^1.56.0"
     },
     "devDependencies": {
-        "@eslint/js": "^9.38.0",
+        "@eslint/js": "^9.39.1",
         "@rollup/plugin-typescript": "^12.3.0",
-        "@types/node": "^24.9.1",
-        "eslint": "^9.38.0",
+        "@types/node": "^24.10.1",
+        "eslint": "^9.39.1",
         "prettier": "^3.6.2",
-        "rollup": "^4.52.5",
+        "rollup": "^4.53.3",
         "serve": "^14.2.5",
         "tslib": "^2.8.1",
-        "typescript-eslint": "^8.46.2",
-        "vitest": "^4.0.3"
+        "typescript-eslint": "^8.47.0",
+        "vitest": "^4.0.13"
     }
 }
