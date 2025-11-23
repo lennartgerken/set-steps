@@ -15,7 +15,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/lennartgerken/set-steps.git"
+        "url": "git+https://github.com/lennartgerken/set-steps.git"
     },
     "bugs": {
         "url": "https://github.com/lennartgerken/set-steps/issues"
@@ -36,8 +36,8 @@
         "pretty": "prettier . --write",
         "pretty-check": "prettier . --check",
         "lint": "eslint .",
-        "test-type-check": "npx tsc -p ./tests/playwright/tsconfig.json --noEmit",
         "build": "rollup -c",
+        "test-type-check": "npx tsc -p ./tests/playwright/tsconfig.json --noEmit",
         "serve-test": "serve tests/playwright/public -l 3000",
         "test": "vitest run"
     },
