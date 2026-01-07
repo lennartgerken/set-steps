@@ -65,8 +65,8 @@ export const expect = createLogExpect(
             let matcherResult: any
             try {
                 const expectation = this.isNot
-                    ? baseExpect(locator).not
-                    : baseExpect(locator)
+                    ? expect(locator).not
+                    : expect(locator)
                 await expectation.toHaveAttribute('type', 'button')
                 pass = true
             } catch (e: any) {
@@ -89,9 +89,7 @@ export const expect = createLogExpect(
             let pass: boolean
             let matcherResult: any
             try {
-                const expectation = this.isNot
-                    ? baseExpect(text).not
-                    : baseExpect(text)
+                const expectation = this.isNot ? expect(text).not : expect(text)
                 expectation.toBe('test')
                 pass = true
             } catch (e: any) {

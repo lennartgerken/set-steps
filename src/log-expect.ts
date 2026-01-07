@@ -49,6 +49,7 @@ type CustomMatchersBase = Parameters<Expect['extend']>[0]
 export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     protected base: Expect
     protected logs: Logs<typeof this.base<any>>
+    protected customMatcherTitles: Set<string>
 
     constructor(
         base: Expect,
@@ -58,6 +59,9 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     ) {
         this.base = base
         this.logs = logs
+        this.customMatcherTitles = new Set(
+            customMatchers ? Object.keys(customMatchers) : []
+        )
 
         if (customMatchers) this.base = this.base.extend(customMatchers)
         if (customLogs)
@@ -68,32 +72,53 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     }
 
     protected getMatchers<T>(actual: T, soft: boolean, message?: string) {
-        const realActual =
-            actual instanceof LogElement ? actual.getBase() : actual
+        const getBaseMatchers = (actual: T) => {
+            return soft ? this.base.soft<T>(actual) : this.base<T>(actual)
+        }
 
-        const baseMatchers = soft
-            ? this.base.soft<T>(realActual)
-            : this.base<T>(realActual)
+        const baseMatchers = getBaseMatchers(actual)
+        const baseUnwrappedMatchers =
+            actual instanceof LogElement
+                ? getBaseMatchers(actual.getBase())
+                : baseMatchers
 
         const createMatchers = (
             matchers: typeof baseMatchers,
+            unwrappedMatchers: typeof baseMatchers,
             not: boolean
         ) => {
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const parent = this
 
             return new Proxy(matchers, {
-                get(target, prop) {
-                    const original = Reflect.get(target, prop, target)
+                get(target, prop, receiver) {
+                    const original = Reflect.get(target, prop, receiver)
+                    const originalUnwrapped = Reflect.get(
+                        unwrappedMatchers,
+                        prop
+                    )
 
                     if (prop === 'not') {
                         return createMatchers(
                             original as typeof baseMatchers,
+                            originalUnwrapped as typeof baseMatchers,
                             true
                         )
                     }
 
-                    if (typeof original === 'function') {
+                    const isCustomMatcher = parent.customMatcherTitles.has(
+                        prop.toString()
+                    )
+
+                    const originalToUse = !isCustomMatcher
+                        ? originalUnwrapped
+                        : original
+
+                    const targetToUse = !isCustomMatcher
+                        ? unwrappedMatchers
+                        : matchers
+
+                    if (typeof originalToUse === 'function') {
                         return (...args: any[]) => {
                             const logFunction = (parent.logs as any)[prop]
                             if (message || logFunction) {
@@ -101,21 +126,24 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
                                     message ||
                                         logFunction(actual, not, ...args),
                                     () => {
-                                        return original.apply(target, args)
+                                        return originalToUse.apply(
+                                            targetToUse,
+                                            args
+                                        )
                                     },
                                     { location: getLocation() }
                                 )
                             }
-                            return original.apply(target, args)
+                            return originalToUse.apply(targetToUse, args)
                         }
                     }
 
-                    return original
+                    return originalToUse
                 }
             })
         }
 
-        return createMatchers(baseMatchers, false) as any
+        return createMatchers(baseMatchers, baseUnwrappedMatchers, false) as any
     }
 
     soft<T>(
