@@ -1,7 +1,6 @@
 import { test, testNoChain, expect } from './custom-test'
 import { TestName } from './test-names'
-
-const url = '/test.html'
+import { url } from '../shared'
 
 test(TestName.BROWSER, async ({ browser }) => {
     await browser.newContext()
@@ -117,6 +116,48 @@ test.describe(() => {
             page.getByRole('heading').describe('Überschrift')
         ).not.toBeButtonType()
     })
+
+    test(TestName.EXTENSION_LOCATOR, async ({ page }) => {
+        await page
+            .getByRole('button', { name: 'click me' })
+            .describe('Button: click me')
+            .clickMe()
+    })
+
+    test(TestName.EXTENSION_LOCATOR_PARAM, async ({ page }) => {
+        await page
+            .getByRole('form')
+            .describe('Formular')
+            .getByLabel('text-enabled')
+            .describe('Textfeld')
+            .write('Test')
+    })
+
+    test(TestName.EXTENSION_LOCATOR_RETURN, async ({ page }) => {
+        await test.step(
+            await page
+                .getByRole('button', { name: 'click me' })
+                .describe('Button: click me')
+                .getText(),
+            async () => {}
+        )
+    })
+})
+
+test(TestName.EXTENSION_BROWSER, async ({ browser }) => {
+    await browser.getNewContext()
+})
+
+test(TestName.EXTENSION_CONTEXT, async ({ context }) => {
+    await context.getNewPage()
+})
+
+test(TestName.EXTENSION_PAGE, async ({ page }) => {
+    await page.nav()
+})
+
+test(TestName.EXTENSION_REQUEST, async ({ request }) => {
+    await request.runGet()
 })
 
 test(TestName.CUSTOM_EXPECT_STRING, async () => {

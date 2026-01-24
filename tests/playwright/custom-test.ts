@@ -3,9 +3,49 @@ import {
     expect as baseExpect,
     Locator,
     ExpectMatcherState,
-    Browser
+    Browser,
+    BrowserContext,
+    APIRequestContext,
+    Page
 } from '@playwright/test'
 import { LogBrowser, createLogExpect } from '@dist/index'
+import { url } from '../shared'
+
+export const browserExtension = {
+    async getNewContext(browser: Browser) {
+        return await browser.newContext()
+    }
+}
+
+export const contextExtension = {
+    async getNewPage(context: BrowserContext) {
+        return await context.newPage()
+    }
+}
+
+export const pageExtension = {
+    async nav(page: Page) {
+        await page.goto(url)
+    }
+}
+
+export const requestExtension = {
+    async runGet(request: APIRequestContext) {
+        return await request.get(url)
+    }
+}
+
+export const locatorExtension = {
+    async clickMe(locator: Locator) {
+        await locator.click()
+    },
+    async getText(locator: Locator) {
+        return await locator.innerText()
+    },
+    async write(locator: Locator, text: string) {
+        await locator.pressSequentially(text)
+    }
+}
 
 const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
     return new LogBrowser(
@@ -23,13 +63,22 @@ const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
             locatorLogs: {
                 click: (name, options) =>
                     `Klicke${options && options.clickCount ? ` ${options.clickCount} mal ` : ' '}Element '${name}'.`,
-                fill: (name, value) => `Schreibe Wert '${value}' in '${name}'.`
+                fill: (name, value) => `Schreibe Wert '${value}' in '${name}'.`,
+                pressSequentially: (name, value) =>
+                    `Gebe Text '${value}' in '${name}' ein.`
             },
             requestLogs: {
                 get: (_name, url) => `Sende GET Request an '${url}'.`
             }
         },
-        chainLocatorNames
+        {
+            chainLocatorNames,
+            browserExtension,
+            contextExtension,
+            pageExtension,
+            locatorExtension,
+            requestExtension
+        }
     )
 }
 
