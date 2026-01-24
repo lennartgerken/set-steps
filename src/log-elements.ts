@@ -225,7 +225,7 @@ export abstract class LogElement<T extends object> {
                 let extensionToUse: any
 
                 if (isBrowser(target.base))
-                    extensionToUse = target.options.locatorExtension
+                    extensionToUse = target.options.browserExtension
                 else if (isContext(target.base))
                     extensionToUse = target.options.contextExtension
                 else if (isRequest(target.base))
