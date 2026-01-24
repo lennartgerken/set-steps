@@ -23,38 +23,48 @@ type AllLogs = {
 }
 type BrowserExtension = Record<
     string,
-    (browser: Browser, ...args: unknown[]) => unknown
+    (browser: Browser, ...args: any[]) => any
 >
 
 type ContextExtension = Record<
     string,
-    (context: BrowserContext, ...args: unknown[]) => unknown
+    (context: BrowserContext, ...args: any[]) => any
 >
 
-type PageExtension = Record<string, (page: Page, ...args: unknown[]) => unknown>
+type PageExtension = Record<string, (page: Page, ...args: any[]) => any>
 
 type LocatorExtension = Record<
     string,
-    (locator: Locator, ...args: unknown[]) => unknown
+    (locator: Locator, ...args: any[]) => any
 >
 
 type RequestExtension = Record<
     string,
-    (request: APIRequestContext, ...args: unknown[]) => unknown
+    (request: APIRequestContext, ...args: any[]) => any
 >
 
-export type Extension<
-    T extends
-        | BrowserExtension
-        | ContextExtension
-        | PageExtension
-        | RequestExtension
-        | LocatorExtension
+type RemoveFirstArg<T extends (...args: any[]) => any> = T extends (
+    first: any,
+    ...args: infer A
+) => infer R
+    ? (...args: A) => R
+    : never
+
+type RemoveFirstArgFromRecord<
+    T extends Record<string, (...args: any[]) => any>
 > = {
-    [Key in keyof T]: T[Key] extends (base: any, ...args: infer A) => infer R
-        ? (...args: A) => R
-        : never
+    [Key in keyof T]: RemoveFirstArg<T[Key]>
 }
+
+export type ExtendLocator<T extends LocatorExtension> =
+    RemoveFirstArgFromRecord<T>
+export type ExtendPage<T extends PageExtension> = RemoveFirstArgFromRecord<T>
+export type ExtendContext<T extends ContextExtension> =
+    RemoveFirstArgFromRecord<T>
+export type ExtendRequest<T extends RequestExtension> =
+    RemoveFirstArgFromRecord<T>
+export type ExtendBrowser<T extends BrowserExtension> =
+    RemoveFirstArgFromRecord<T>
 
 function isBrowser(value: unknown): value is Browser {
     return (

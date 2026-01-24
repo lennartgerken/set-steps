@@ -1,4 +1,3 @@
-import { Extension } from '@dist/log-elements'
 import '@playwright/test'
 import {
     browserExtension,
@@ -7,11 +6,19 @@ import {
     pageExtension,
     requestExtension
 } from './custom-test'
+import {
+    ExtendBrowser,
+    ExtendContext,
+    ExtendLocator,
+    ExtendPage,
+    ExtendRequest
+} from '@dist/log-elements'
 
 declare module '@playwright/test' {
-    interface Browser extends Extension<typeof browserExtension> {}
-    interface BrowserContext extends Extension<typeof contextExtension> {}
-    interface Page extends Extension<typeof pageExtension> {}
-    interface Locator extends Extension<typeof locatorExtension> {}
-    interface APIRequestContext extends Extension<typeof requestExtension> {}
+    interface Browser extends ExtendBrowser<typeof browserExtension> {}
+    interface BrowserContext extends ExtendContext<typeof contextExtension> {}
+    interface Page extends ExtendPage<typeof pageExtension> {}
+    interface Locator extends ExtendLocator<typeof locatorExtension> {}
+    interface APIRequestContext
+        extends ExtendRequest<typeof requestExtension> {}
 }
