@@ -48,9 +48,8 @@ export const locatorExtension = {
 }
 
 const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
-    return new LogBrowser(
-        browser,
-        {
+    return new LogBrowser(browser, {
+        logs: {
             browserLogs: {
                 newContext: () => 'Öffne neuen Context.'
             },
@@ -71,15 +70,13 @@ const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
                 get: (_name, url) => `Sende GET Request an '${url}'.`
             }
         },
-        {
-            chainLocatorNames,
-            browserExtension,
-            contextExtension,
-            pageExtension,
-            locatorExtension,
-            requestExtension
-        }
-    )
+        browserExtension,
+        contextExtension,
+        pageExtension,
+        locatorExtension,
+        requestExtension,
+        chainLocatorNames
+    })
 }
 
 export const test = baseTest.extend({

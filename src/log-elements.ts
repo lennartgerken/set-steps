@@ -105,11 +105,19 @@ function isLocator(value: unknown): value is Locator {
 }
 
 type Options = {
+    /**Defines a test step for each method of `Browser`, `BrowserContext`, `APIRequestContext`, `Page`, and `Locator`.*/
+    logs?: AllLogs
+    /**Specifies additional methods for `Browser` objects.*/
     browserExtension?: BrowserExtension
+    /**Specifies additional methods for `BrowserContext` objects.*/
     contextExtension?: ContextExtension
+    /**Specifies additional methods for `Page` objects.*/
     pageExtension?: PageExtension
+    /**Specifies additional methods for `APIRequestContext` objects.*/
     requestExtension?: RequestExtension
+    /**Specifies additional methods for `Locator` objects.*/
     locatorExtension?: LocatorExtension
+    /**When `true`, each newly created `Locator` will have its name merged with its parent locator’s name.*/
     chainLocatorNames?: boolean
 }
 
@@ -122,14 +130,13 @@ export interface LogLocator extends Locator {}
 export abstract class LogElement<T extends object> {
     protected base: T
     protected usedName: string
-    protected logs: AllLogs
-    protected options: Options
+    protected options: Required<Options>
 
-    constructor(base: T, name: string, logs: AllLogs, options: Options = {}) {
+    constructor(base: T, name: string, options: Options = {}) {
         this.base = base
         this.usedName = name
-        this.logs = logs
         this.options = {
+            logs: options.logs ?? {},
             browserExtension: options.browserExtension ?? {},
             contextExtension: options.contextExtension ?? {},
             pageExtension: options.pageExtension ?? {},
@@ -156,16 +163,16 @@ export abstract class LogElement<T extends object> {
                 if (returnValue instanceof LogElement) return returnValue
 
                 if (isBrowser(returnValue))
-                    return new LogBrowser(returnValue, this.logs, options)
+                    return new LogBrowser(returnValue, options)
 
                 if (isContext(returnValue))
-                    return new LogContext(returnValue, this.logs, options)
+                    return new LogContext(returnValue, options)
 
                 if (isPage(returnValue))
-                    return new LogPage(returnValue, this.logs, options)
+                    return new LogPage(returnValue, options)
 
                 if (isLocator(returnValue))
-                    return new LogLocator(returnValue, this.logs, {
+                    return new LogLocator(returnValue, {
                         ...options,
                         parentName:
                             this instanceof LogLocator
@@ -174,7 +181,7 @@ export abstract class LogElement<T extends object> {
                     })
 
                 if (isRequest(returnValue))
-                    return new LogRequest(returnValue, this.logs, options)
+                    return new LogRequest(returnValue, options)
             }
             return returnValue
         }
@@ -245,15 +252,15 @@ export abstract class LogElement<T extends object> {
                         let logsToUse: any
 
                         if (isBrowser(target.base))
-                            logsToUse = target.logs.browserLogs
+                            logsToUse = target.options.logs.browserLogs
                         else if (isContext(target.base))
-                            logsToUse = target.logs.contextLogs
+                            logsToUse = target.options.logs.contextLogs
                         else if (isRequest(target.base))
-                            logsToUse = target.logs.requestLogs
+                            logsToUse = target.options.logs.requestLogs
                         else if (isPage(target.base))
-                            logsToUse = target.logs.pageLogs
+                            logsToUse = target.options.logs.pageLogs
                         else if (isLocator(target.base))
-                            logsToUse = target.logs.locatorLogs
+                            logsToUse = target.options.logs.locatorLogs
 
                         const logFunction = logsToUse
                             ? logsToUse[prop]
@@ -304,33 +311,28 @@ export class LogBrowser extends LogElement<Browser> {
      * will also be wrapped as `LogElement` instances.
      *
      * @param browser The Playwright `Browser` instance.
-     * @param logs Defines a test step for each method of `Browser`, `BrowserContext`, `APIRequestContext`, `Page`, and `Locator`.
-     * @param chainLocatorNames When `true`, each newly created `Locator` will have its name merged with its parent locator’s name.
+     * @param options Options to configure the `LogBrowser`.
      */
-    constructor(browser: Browser, logs: AllLogs, options: Options = {}) {
-        super(browser, browser.browserType().name(), logs, options)
+    constructor(browser: Browser, options: Options = {}) {
+        super(browser, browser.browserType().name(), options)
     }
 }
 
 export class LogContext extends LogElement<BrowserContext> {
-    constructor(context: BrowserContext, logs: AllLogs, options: Options = {}) {
-        super(context, 'context', logs, options)
+    constructor(context: BrowserContext, options: Options = {}) {
+        super(context, 'context', options)
     }
 }
 
 export class LogRequest extends LogElement<APIRequestContext> {
-    constructor(
-        request: APIRequestContext,
-        logs: AllLogs,
-        options: Options = {}
-    ) {
-        super(request, 'request', logs, options)
+    constructor(request: APIRequestContext, options: Options = {}) {
+        super(request, 'request', options)
     }
 }
 
 export class LogPage extends LogElement<Page> {
-    constructor(page: Page, logs: AllLogs, options: Options = {}) {
-        super(page, 'page', logs, options)
+    constructor(page: Page, options: Options = {}) {
+        super(page, 'page', options)
     }
 }
 
@@ -339,10 +341,9 @@ export class LogLocator extends LogElement<Locator> {
 
     constructor(
         locator: Locator,
-        logs: AllLogs,
         options: Options & { parentName?: string } = {}
     ) {
-        super(locator, String(locator), logs, options)
+        super(locator, String(locator), options)
         this.parentName = options.parentName
         if (this.options.chainLocatorNames) this.describe('')
         else this.describe(this.usedName)
