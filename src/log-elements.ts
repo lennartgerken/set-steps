@@ -21,28 +21,24 @@ type AllLogs = {
     pageLogs?: Logs<Page>
     locatorLogs?: Logs<Locator>
 }
-
-export type BrowserExtension = Record<
+type BrowserExtension = Record<
     string,
     (browser: Browser, ...args: unknown[]) => unknown
 >
 
-export type ContextExtension = Record<
+type ContextExtension = Record<
     string,
     (context: BrowserContext, ...args: unknown[]) => unknown
 >
 
-export type PageExtension = Record<
-    string,
-    (page: Page, ...args: unknown[]) => unknown
->
+type PageExtension = Record<string, (page: Page, ...args: unknown[]) => unknown>
 
-export type LocatorExtension = Record<
+type LocatorExtension = Record<
     string,
     (locator: Locator, ...args: unknown[]) => unknown
 >
 
-export type RequestExtension = Record<
+type RequestExtension = Record<
     string,
     (request: APIRequestContext, ...args: unknown[]) => unknown
 >
