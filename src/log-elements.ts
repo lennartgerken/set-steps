@@ -66,6 +66,23 @@ export type ExtendRequest<T extends RequestExtension> =
 export type ExtendBrowser<T extends BrowserExtension> =
     RemoveFirstArgFromRecord<T>
 
+type Options = {
+    /** Defines per-method log message builders that wrap Playwright calls in test steps. */
+    logs?: AllLogs
+    /** Adds extra methods to wrapped `Browser` instances. */
+    browserExtension?: BrowserExtension
+    /** Adds extra methods to wrapped `BrowserContext` instances. */
+    contextExtension?: ContextExtension
+    /** Adds extra methods to wrapped `Page` instances. */
+    pageExtension?: PageExtension
+    /** Adds extra methods to wrapped `APIRequestContext` instances. */
+    requestExtension?: RequestExtension
+    /** Adds extra methods to wrapped `Locator` instances. */
+    locatorExtension?: LocatorExtension
+    /** When true, each new `Locator` inherits and chains its parent name. */
+    chainLocatorNames?: boolean
+}
+
 function isBrowser(value: unknown): value is Browser {
     return (
         typeof value === 'object' &&
@@ -112,23 +129,6 @@ function isLocator(value: unknown): value is Locator {
         typeof (value as Locator).click === 'function' &&
         (value as Page).goto == null
     )
-}
-
-type Options = {
-    /**Defines a test step for each method of `Browser`, `BrowserContext`, `APIRequestContext`, `Page`, and `Locator`.*/
-    logs?: AllLogs
-    /**Specifies additional methods for `Browser` objects.*/
-    browserExtension?: BrowserExtension
-    /**Specifies additional methods for `BrowserContext` objects.*/
-    contextExtension?: ContextExtension
-    /**Specifies additional methods for `Page` objects.*/
-    pageExtension?: PageExtension
-    /**Specifies additional methods for `APIRequestContext` objects.*/
-    requestExtension?: RequestExtension
-    /**Specifies additional methods for `Locator` objects.*/
-    locatorExtension?: LocatorExtension
-    /**When `true`, each newly created `Locator` will have its name merged with its parent locator’s name.*/
-    chainLocatorNames?: boolean
 }
 
 export interface LogBrowser extends Browser {}
@@ -313,15 +313,13 @@ export abstract class LogElement<T extends object> {
 
 export class LogBrowser extends LogElement<Browser> {
     /**
-     * Creates a new `LogBrowser` instance.
+     * Creates a `LogBrowser` wrapper for a Playwright `Browser`.
      *
-     * Wraps the Playwright `Browser` so that each method call can be logged as a custom test step.
+     * All descendants (`BrowserContext`, `APIRequestContext`, `Page`, `Locator`) are returned as `LogElement`s so
+     * logging and extensions defined in `options` apply automatically.
      *
-     * All child objects (`BrowserContext`, `APIRequestContext`, `Page`, and `Locator`)
-     * will also be wrapped as `LogElement` instances.
-     *
-     * @param browser The Playwright `Browser` instance.
-     * @param options Options to configure the `LogBrowser`.
+     * @param browser Playwright `Browser` to wrap.
+     * @param options Logging and extension configuration for wrapped elements.
      */
     constructor(browser: Browser, options: Options = {}) {
         super(browser, browser.browserType().name(), options)
