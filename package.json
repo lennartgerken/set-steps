@@ -3,7 +3,7 @@
     "version": "0.3.4",
     "license": "MIT",
     "author": "Lennart Gerken",
-    "description": "Automatically add expressive test steps to Playwright actions and extend core APIs with custom methods.",
+    "description": "Automatically inject test steps into Playwright actions and extend core APIs with custom methods.",
     "keywords": [
         "e2e",
         "playwright",

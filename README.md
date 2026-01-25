@@ -1,6 +1,6 @@
 # set-steps
 
-Automatically add expressive test steps to Playwright actions and extend core APIs with custom methods.
+Automatically inject test steps into Playwright actions and extend core APIs with custom methods.
 
 ## Installation
 
