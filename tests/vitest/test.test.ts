@@ -1,8 +1,7 @@
 import { execSync } from 'child_process'
 import { expect, test, describe } from 'vitest'
 import { TestName } from '../playwright/test-names'
-
-const url = '/test.html'
+import { url } from '../shared'
 
 for (const browser of ['chromium', 'firefox', 'webkit']) {
     describe(browser, () => {
@@ -123,6 +122,48 @@ for (const browser of ['chromium', 'firefox', 'webkit']) {
         test(TestName.CUSTOM_EXPECT_LOCATOR_NOT, () => {
             expect(tests.get(TestName.CUSTOM_EXPECT_LOCATOR_NOT)).toBe(
                 "Prüfe, ob 'Überschrift' nicht den Typ 'button' hat."
+            )
+        })
+
+        test(TestName.EXTENSION_BROWSER, () => {
+            expect(tests.get(TestName.EXTENSION_BROWSER)).toBe(
+                'Öffne neuen Context.'
+            )
+        })
+
+        test(TestName.EXTENSION_CONTEXT, () => {
+            expect(tests.get(TestName.EXTENSION_CONTEXT)).toBe(
+                'Öffne neue Page.'
+            )
+        })
+
+        test(TestName.EXTENSION_PAGE, () => {
+            expect(tests.get(TestName.EXTENSION_PAGE)).toBe(
+                `Navigiere zu URL '${url}'.`
+            )
+        })
+
+        test(TestName.EXTENSION_LOCATOR, () => {
+            expect(tests.get(TestName.LOCATOR_DESCRIBE)).toBe(
+                "Klicke Element 'Button: click me'."
+            )
+        })
+
+        test(TestName.EXTENSION_LOCATOR_PARAM, () => {
+            expect(tests.get(TestName.EXTENSION_LOCATOR_PARAM)).toBe(
+                "Gebe Text 'Test' in 'Formular > Textfeld' ein."
+            )
+        })
+
+        test(TestName.EXTENSION_LOCATOR_RETURN, () => {
+            expect(tests.get(TestName.EXTENSION_LOCATOR_RETURN)).toBe(
+                'Click me'
+            )
+        })
+
+        test(TestName.EXTENSION_REQUEST, () => {
+            expect(tests.get(TestName.EXTENSION_REQUEST)).toBe(
+                `Sende GET Request an '${url}'.`
             )
         })
 

@@ -1,7 +1,16 @@
 export enum TestName {
     BROWSER = 'browser',
     CONTEXT = 'context',
-    LOCATOR_NO_CHAIN = 'locator no chain',
+    CUSTOM_EXPECT_LOCATOR = 'custom expect locator',
+    CUSTOM_EXPECT_LOCATOR_NOT = 'custom expect locator not',
+    CUSTOM_EXPECT_STRING = 'custom expect string',
+    EXTENSION_BROWSER = 'extension browser',
+    EXTENSION_CONTEXT = 'extension context',
+    EXTENSION_LOCATOR = 'extension locator',
+    EXTENSION_PAGE = 'extension page',
+    EXTENSION_REQUEST = 'extension request',
+    EXTENSION_LOCATOR_PARAM = 'extension locator param',
+    EXTENSION_LOCATOR_RETURN = 'extension locator return',
     LOCATOR_DESCRIBE_NO_CHAIN = 'locator describe no chain',
     LOCATOR_DESCRIBE = 'locator describe',
     LOCATOR_DESCRIBE_OPTIONS = 'locator describe options',
@@ -13,9 +22,7 @@ export enum TestName {
     LOCATOR_EXPECT = 'locator expect',
     LOCATOR_EXPECT_OPTIONS = 'locator expect options',
     LOCATOR_EXPECT_NOT = 'locator expect not',
-    CUSTOM_EXPECT_LOCATOR = 'custom expect locator',
-    CUSTOM_EXPECT_LOCATOR_NOT = 'custom expect locator not',
-    CUSTOM_EXPECT_STRING = 'custom expect string',
+    LOCATOR_NO_CHAIN = 'locator no chain',
     PAGE = 'page',
     REQUEST = 'request'
 }
