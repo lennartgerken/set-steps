@@ -1,6 +1,6 @@
 {
     "name": "set-steps",
-    "version": "0.3.4",
+    "version": "0.4.0",
     "license": "MIT",
     "author": "Lennart Gerken",
     "description": "Automatically inject test steps into Playwright actions and extend core APIs with custom methods.",
