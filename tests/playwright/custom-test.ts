@@ -156,8 +156,6 @@ export const expect = createLogExpect(
     },
     {
         toBeButtonType: (actual, not) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`,
-        toBeTestText: (actual, not) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}'test' ist.`
+            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
     }
 )

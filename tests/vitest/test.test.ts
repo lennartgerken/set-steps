@@ -166,11 +166,5 @@ for (const browser of ['chromium', 'firefox', 'webkit']) {
                 `Sende GET Request an '${url}'.`
             )
         })
-
-        test(TestName.CUSTOM_EXPECT_STRING, () => {
-            expect(tests.get(TestName.CUSTOM_EXPECT_STRING)).toBe(
-                "Prüfe, ob 'test' 'test' ist."
-            )
-        })
     })
 }

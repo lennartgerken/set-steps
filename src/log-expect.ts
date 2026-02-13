@@ -4,15 +4,27 @@ import { LogElement } from './log-elements'
 import { getLocation } from './get-location'
 
 type Logs<T extends (...args: any) => any> = {
-    [K in keyof ReturnType<T>]?: ReturnType<T>[K] extends (
-        ...args: infer P
-    ) => any
+    [K in keyof ReturnType<T> as ReturnType<T>[K] extends (
+        ...args: any[]
+    ) => infer R
+        ? R extends Promise<any>
+            ? K
+            : never
+        : never]?: ReturnType<T>[K] extends (...args: infer P) => any
         ? (actual: any, not: boolean, ...args: P) => string
         : never
 }
 
 type CustomLogs<T extends Record<string, any>> = {
-    [K in keyof T]?: T[K] extends (
+    [K in keyof T as T[K] extends (
+        this: any,
+        receiver: any,
+        ...args: any[]
+    ) => infer R
+        ? R extends Promise<any>
+            ? K
+            : never
+        : never]?: T[K] extends (
         this: any,
         receiver: any,
         ...args: infer P
@@ -73,7 +85,9 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
 
     protected getMatchers<T>(actual: T, soft: boolean, message?: string) {
         const getBaseMatchers = (actual: T) => {
-            return soft ? this.base.soft<T>(actual) : this.base<T>(actual)
+            return soft
+                ? this.base.soft<T>(actual, message)
+                : this.base<T>(actual, message)
         }
 
         const baseMatchers = getBaseMatchers(actual)
@@ -121,10 +135,9 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
                     if (typeof originalToUse === 'function') {
                         return (...args: any[]) => {
                             const logFunction = (parent.logs as any)[prop]
-                            if (message || logFunction) {
+                            if (logFunction) {
                                 return test.step(
-                                    message ||
-                                        logFunction(actual, not, ...args),
+                                    logFunction(actual, not, ...args),
                                     () => {
                                         return originalToUse.apply(
                                             targetToUse,
