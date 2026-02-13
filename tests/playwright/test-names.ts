@@ -3,7 +3,6 @@ export enum TestName {
     CONTEXT = 'context',
     CUSTOM_EXPECT_LOCATOR = 'custom expect locator',
     CUSTOM_EXPECT_LOCATOR_NOT = 'custom expect locator not',
-    CUSTOM_EXPECT_STRING = 'custom expect string',
     EXTENSION_BROWSER = 'extension browser',
     EXTENSION_CONTEXT = 'extension context',
     EXTENSION_LOCATOR = 'extension locator',

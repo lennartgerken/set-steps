@@ -9,8 +9,12 @@ import type {
 import { getLocation } from './get-location'
 
 type Logs<T> = {
-    [Key in keyof T]?: T[Key] extends (...args: any[]) => any
-        ? (usedName: string, ...args: Parameters<T[Key]>) => string
+    [Key in keyof T as T[Key] extends (...args: any[]) => infer R
+        ? R extends Promise<any>
+            ? Key
+            : never
+        : never]?: T[Key] extends (...args: infer P) => any
+        ? (usedName: string, ...args: P) => string
         : never
 }
 

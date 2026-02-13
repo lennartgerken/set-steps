@@ -159,7 +159,3 @@ test(TestName.EXTENSION_PAGE, async ({ page }) => {
 test(TestName.EXTENSION_REQUEST, async ({ request }) => {
     await request.runGet()
 })
-
-test(TestName.CUSTOM_EXPECT_STRING, async () => {
-    expect('test').toBeTestText()
-})
