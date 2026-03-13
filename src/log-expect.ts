@@ -26,10 +26,10 @@ type CustomLogs<T extends Record<string, any>> = {
             : never
         : never]?: T[K] extends (
         this: any,
-        receiver: any,
+        receiver: infer R,
         ...args: infer P
     ) => any
-        ? (actual: any, not: boolean, ...args: P) => string
+        ? (actual: R, not: boolean, ...args: P) => string
         : never
 }
 
