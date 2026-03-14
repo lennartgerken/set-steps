@@ -94,9 +94,8 @@ export const testNoChain = baseTest.extend({
     }
 })
 
-export const expect = createLogExpect(
-    baseExpect,
-    {
+export const expect = createLogExpect(baseExpect, {
+    logs: {
         toHaveText: (actual, not, expected) =>
             `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`,
         toBeEditable: (actual, not, options) => {
@@ -104,7 +103,7 @@ export const expect = createLogExpect(
             return `Prüfe, ob '${actual}'${(not && editable) || (!not && !editable) ? ' nicht ' : ' '}editierbar ist.`
         }
     },
-    {
+    customMatchers: {
         async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
             const assertionName = 'toBeButtonType'
             let pass: boolean
@@ -154,8 +153,8 @@ export const expect = createLogExpect(
             }
         }
     },
-    {
+    customLogs: {
         toBeButtonType: (actual, not) =>
             `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
     }
-)
+})
