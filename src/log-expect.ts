@@ -63,6 +63,12 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     protected customMatchers: CM
     protected customMatcherTitles: Set<string>
 
+    /**
+     * Creates a new `LogExpect` instance.
+     *
+     * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
+     * @param base The base Playwright `expect` function to wrap.
+     */
     constructor(base: Expect) {
         this.base = base
         this.logs = {}
@@ -71,7 +77,7 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     }
 
     /**
-     * Defines custom log messages for the expect matchers.
+     * Defines custom log messages for the default `expect` matchers.
      * @param logs An array of log definitions.
      */
     defineLogs<Ls extends unknown[]>(logs: {
@@ -202,7 +208,7 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     }
 
     /**
-     * Builds the final LogExpect instance which is also a callable function. The returned function can be used as a normal expect function.
+     * Builds the final `LogExpect` instance which is also a callable function. The returned function can be used as a normal expect function.
      */
     build(): LogExpect<CM> &
         (<T>(
