@@ -57,33 +57,55 @@ type ExpectReturn<
 
 type CustomMatchersBase = Parameters<Expect['extend']>[0]
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
+export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     protected base: Expect
     protected logs: Logs<typeof this.base<any>>
+    protected customMatchers: CM
     protected customMatcherTitles: Set<string>
 
-    constructor(
-        base: Expect,
-        options: {
-            logs?: Logs<typeof base<any>>
-            customMatchers?: CustomMatchers
-            customLogs?: CustomLogs<CustomMatchers>
-        } = {}
-    ) {
+    constructor(base: Expect) {
         this.base = base
-        this.logs = options.logs ?? {}
-        this.customMatcherTitles = new Set(
-            options.customMatchers ? Object.keys(options.customMatchers) : []
-        )
+        this.logs = {}
+        this.customMatchers = {} as CM
+        this.customMatcherTitles = new Set([])
+    }
 
-        if (options.customMatchers)
-            this.base = this.base.extend(options.customMatchers)
-        if (options.customLogs)
+    /**
+     * Defines custom log messages for the expect matchers.
+     * @param logs An array of log definitions.
+     */
+    defineLogs<Ls extends unknown[]>(logs: {
+        [I in keyof Ls]: Logs<typeof this.base<Ls[I]>>
+    }) {
+        this.logs = logs.reduce(
+            (merged, current) => Object.assign(merged, current),
+            this.logs
+        )
+        return this
+    }
+
+    /**
+     * Defines custom matchers and optionally their corresponding log messages.
+     * @param customMatchers An object containing the custom matchers to define.
+     * @param customLogs An object containing the log messages for the custom matchers.
+     */
+    defineCustomMatchers<NewCM extends CustomMatchersBase>(
+        customMatchers: NewCM,
+        customLogs?: CustomLogs<NewCM>
+    ) {
+        this.base = this.base.extend(customMatchers)
+        Object.keys(customMatchers).forEach((key) =>
+            this.customMatcherTitles.add(key)
+        )
+        ;(this as any).customMatchers = customMatchers
+        if (customLogs) {
             this.logs = {
                 ...this.logs,
-                ...options.customLogs
+                ...customLogs
             }
+        }
+        this.customMatcherTitles = new Set(Object.keys(customMatchers))
+        return this as unknown as LogExpect<NewCM>
     }
 
     protected getMatchers<T>(actual: T, soft: boolean, message?: string) {
@@ -165,45 +187,34 @@ export class LogExpect<CustomMatchers extends CustomMatchersBase = {}> {
     soft<T>(
         actual: T,
         message?: string
-    ): ExpectReturn<typeof this.base<T>, CustomMatchers, T> {
+    ): ExpectReturn<typeof this.base<T>, CM, T> {
         return this.getMatchers(actual, true, message)
     }
 
     expect<T>(
         actual: T,
         message?: string
-    ): ExpectReturn<typeof this.base<T>, CustomMatchers, T> {
+    ): ExpectReturn<typeof this.base<T>, CM, T> {
         return this.getMatchers(actual, false, message)
     }
-}
 
-/**
- * Creates a new `LogExpect` instance.
- *
- * Wraps the Playwright `expect` so that each expect call can be logged as a custom test step.
- *
- * @param base The base Playwright `expect` function to wrap.
- * @param options An object to configure the `LogExpect` instance.
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export function createLogExpect<CustomMatchers extends CustomMatchersBase = {}>(
-    base: Expect,
-    options: {
-        /** Defines a test step for each `expect` method. */
-        logs?: Logs<typeof base<any>>
-        /** Defines custom matcher functions. */
-        customMatchers?: CustomMatchers
-        /** Defines the corresponding test steps for the custom matcher functions. */
-        customLogs?: CustomLogs<CustomMatchers>
-    } = {}
-) {
-    const logExpect = new LogExpect(base, options)
-    const callableExpect = (<T>(actual: T, message?: string) =>
-        logExpect.expect(actual, message)) as LogExpect<CustomMatchers> &
+    /**
+     * Builds the final LogExpect instance which is also a callable function. The returned function can be used as a normal expect function.
+     */
+    build(): LogExpect<CM> &
         (<T>(
             actual: T,
             message?: string
-        ) => ExpectReturn<typeof base<T>, CustomMatchers, T>)
-    Object.setPrototypeOf(callableExpect, logExpect)
-    return callableExpect
+        ) => ExpectReturn<typeof this.base<T>, CM, T>) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const logExpect = this
+        const callableExpect = (<T>(actual: T, message?: string) =>
+            logExpect.expect(actual, message)) as LogExpect<CM> &
+            (<T>(
+                actual: T,
+                message?: string
+            ) => ExpectReturn<typeof logExpect.base<T>, CM, T>)
+        Object.setPrototypeOf(callableExpect, logExpect)
+        return callableExpect
+    }
 }

@@ -6,4 +6,4 @@ export {
     ExtendRequest,
     ExtendLocator
 } from './log-elements'
-export { createLogExpect } from './log-expect'
+export { LogExpect } from './log-expect'
