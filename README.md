@@ -10,7 +10,7 @@ npm i -D set-steps
 
 ## Overview
 
-`set-steps` enhances Playwright reports by automatically wrapping actions and assertions into test steps and by allowing you to extend Playwright’s core APIs with custom, reusable methods. This keeps test code concise while enabling custom, localized or more expressive messages for every action in one place.
+`set-steps` enhances Playwright by automatically wrapping actions and assertions into test steps and by allowing you to extend Playwright’s core APIs with custom, reusable methods. This keeps test code concise while enabling custom, localized or more expressive messages for every action in one place.
 
 ## Example Usage
 
@@ -20,14 +20,14 @@ To use `set-steps`, wrap your existing Playwright `Browser` instance in a `LogBr
 The Playwright `Browser` instance and an `options` object to configure the `LogBrowser`. The following options can be set:
 
 - `logs`: An object defining the step titles for methods of `Browser`, `BrowserContext`, `APIRequestContext`, `Page`, and `Locator`
-- `chainLocatorNames`: A boolean flag whether to chain names of child `Locator` objects.
-- `browserExtension`, `contextExtension`, `pageExtension`, `requestExtension` and `locatorExtension`: Objects to extend every object of the respective type with additional methods.
+- `chainLocatorNames`: A boolean flag whether to chain names of child `Locator` objects
+- `browserExtension`, `contextExtension`, `pageExtension`, `requestExtension` and `locatorExtension`: Objects to extend every object of the respective type with additional methods
 
 The simplest way to integrate `LogBrowser` is by overriding the built-in `browser` fixture:
 
 ```ts
 import { test as baseTest, expect as baseExpect } from '@playwright/test'
-import { LogBrowser, createLogExpect } from 'set-steps'
+import { LogBrowser, LogExpect } from 'set-steps'
 
 export const test = baseTest.extend({
     browser: async ({ browser }, use) => {
@@ -60,18 +60,33 @@ In this example, test steps are localized in German. Each step function receives
 As a second step, wrap Playwright’s `expect` with a `LogExpect` instance. This lets you define custom test steps for each assertion:
 
 ```ts
-export const expect = createLogExpect(baseExpect, {
-    toHaveText: (actual, not, expected) =>
-        `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
-})
+import { test as baseTest, expect as baseExpect } from '@playwright/test'
+import { LogBrowser, LogExpect } from 'set-steps'
+
+...
+
+export const expect = new LogExpect(baseExpect)
+    .defineLogs<[Locator, APIResponse]>([
+        {
+            toHaveText: (actual, not, expected) =>
+                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
+        },
+        {
+            toBeOK: (actual, not) =>
+                `Prüfe, ob die Antwort von '${actual.url()}' ${not ? 'nicht ' : ''}OK ist.`
+        }
+    ])
+    .build()
 ```
 
-Here we define a custom test step for `toHaveText`.
+Here we define a custom test step for `toHaveText` of the `Locator` matchers and `toBeOK` of the `APIResponse` matchers.
 Each test step definition function receives three parameters:
 
 - actual: The value passed to `expect` (for `toHaveText` this would be the `Locator`)
 - not: A boolean indicating negation
-- expected: The expected value
+- expected (if present): The expected value
+
+It is important to call `build` after all `defineLogs` and `defineCustomMatchers` calls to get the final `LogExpect` instance.
 
 Once your `browser` fixture is wrapped, Playwright automatically provides a `LogPage` instance as the `page` fixture in your test cases:
 
@@ -111,26 +126,30 @@ Prüfe, ob 'Überschrift' den Text 'Header' beinhaltet.
 
 ### Custom Matchers
 
-You can define custom matchers by passing them as a third argument to the `createLogExpect` function.
-A fourth argument specifies the corresponding test steps:
+You can call `defineCustomMatchers` to define custom matchers with their corresponding log messages. For example, let’s say we want to create a `toBeButtonType` matcher for `Locator` objects:
 
 ```ts
-export const expect = createLogExpect(
-    baseExpect,
-    {
-        toHaveText: (actual, not, expected) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`
-    },
-    {
-        async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
-            ...
+import { test as baseTest, expect as baseExpect } from '@playwright/test'
+import { LogBrowser, LogExpect } from 'set-steps'
+
+...
+
+export const expect = new LogExpect(baseExpect)
+    .defineLogs<[Locator, APIResponse]>([
+        ...
+    ])
+    .defineCustomMatchers(
+        {
+            async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
+                ...
+            }
         },
-    },
-    {
-        toBeButtonType: (actual, not) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`,
-    }
-)
+        {
+            toBeButtonType: (actual, not) =>
+                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
+        }
+    )
+    .build()
 ```
 
 ### Extensions
@@ -139,7 +158,7 @@ With extensions, you can, for example, add methods to every `Locator` object. Le
 
 ```ts
 import { test as baseTest, expect as baseExpect } from '@playwright/test'
-import { LogBrowser, createLogExpect } from 'set-steps'
+import { LogBrowser, LogExpect } from 'set-steps'
 
 export const locatorExtension = {
     async write(locator: Locator, text: string) {
