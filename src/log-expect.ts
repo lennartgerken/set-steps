@@ -97,7 +97,10 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
         Object.keys(customMatchers).forEach((key) =>
             this.customMatcherTitles.add(key)
         )
-        ;(this as any).customMatchers = customMatchers
+        ;(this as any).customMatchers = {
+            ...this.customMatchers,
+            ...customMatchers
+        }
         if (customLogs) {
             this.logs = {
                 ...this.logs,
@@ -105,7 +108,7 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
             }
         }
         this.customMatcherTitles = new Set(Object.keys(customMatchers))
-        return this as unknown as LogExpect<NewCM>
+        return this as unknown as LogExpect<NewCM & CM>
     }
 
     protected getMatchers<T>(actual: T, soft: boolean, message?: string) {
