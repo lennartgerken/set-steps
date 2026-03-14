@@ -3,7 +3,7 @@ import type { Expect } from '@playwright/test'
 import { LogElement } from './log-elements'
 import { getLocation } from './get-location'
 
-type Logs<T extends (...args: any) => any> = {
+type Logs<T extends (...args: any) => any, A> = {
     [K in keyof ReturnType<T> as ReturnType<T>[K] extends (
         ...args: any[]
     ) => infer R
@@ -11,7 +11,7 @@ type Logs<T extends (...args: any) => any> = {
             ? K
             : never
         : never]?: ReturnType<T>[K] extends (...args: infer P) => any
-        ? (actual: any, not: boolean, ...args: P) => string
+        ? (actual: A, not: boolean, ...args: P) => string
         : never
 }
 
@@ -59,7 +59,7 @@ type CustomMatchersBase = Parameters<Expect['extend']>[0]
 
 export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     protected base: Expect
-    protected logs: Logs<typeof this.base<any>>
+    protected logs: Logs<typeof this.base<any>, any>
     protected customMatchers: CM
     protected customMatcherTitles: Set<string>
 
@@ -75,7 +75,7 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
      * @param logs An array of log definitions.
      */
     defineLogs<Ls extends unknown[]>(logs: {
-        [I in keyof Ls]: Logs<typeof this.base<Ls[I]>>
+        [I in keyof Ls]: Logs<typeof this.base<Ls[I]>, Ls[I]>
     }) {
         this.logs = logs.reduce(
             (merged, current) => Object.assign(merged, current),

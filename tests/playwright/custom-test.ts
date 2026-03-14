@@ -6,7 +6,8 @@ import {
     Browser,
     BrowserContext,
     APIRequestContext,
-    Page
+    Page,
+    APIResponse
 } from '@playwright/test'
 import { LogBrowser, LogExpect } from '@dist/index'
 import { url } from '../shared'
@@ -95,7 +96,7 @@ export const testNoChain = baseTest.extend({
 })
 
 export const expect = new LogExpect(baseExpect)
-    .defineLogs<[Locator]>([
+    .defineLogs<[Locator, APIResponse]>([
         {
             toHaveText: (actual, not, expected) =>
                 `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`,
@@ -103,6 +104,10 @@ export const expect = new LogExpect(baseExpect)
                 const editable = !options || options.editable
                 return `Prüfe, ob '${actual}'${(not && editable) || (!not && !editable) ? ' nicht ' : ' '}editierbar ist.`
             }
+        },
+        {
+            toBeOK: (actual, not) =>
+                `Prüfe, ob Antwort von '${actual.url()}'${not ? ' nicht ' : ' '}OK ist.`
         }
     ])
     .defineCustomMatchers(
