@@ -6,9 +6,10 @@ import {
     Browser,
     BrowserContext,
     APIRequestContext,
-    Page
+    Page,
+    APIResponse
 } from '@playwright/test'
-import { LogBrowser, createLogExpect } from '@dist/index'
+import { LogBrowser, LogExpect } from '@dist/index'
 import { url } from '../shared'
 
 export const browserExtension = {
@@ -94,68 +95,77 @@ export const testNoChain = baseTest.extend({
     }
 })
 
-export const expect = createLogExpect(
-    baseExpect,
-    {
-        toHaveText: (actual, not, expected) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`,
-        toBeEditable: (actual, not, options) => {
-            const editable = !options || options.editable
-            return `Prüfe, ob '${actual}'${(not && editable) || (!not && !editable) ? ' nicht ' : ' '}editierbar ist.`
-        }
-    },
-    {
-        async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
-            const assertionName = 'toBeButtonType'
-            let pass: boolean
-            let matcherResult: any
-            try {
-                const expectation = this.isNot
-                    ? expect(locator).not
-                    : expect(locator)
-                await expectation.toHaveAttribute('type', 'button')
-                pass = true
-            } catch (e: any) {
-                matcherResult = e.matcherResult
-                pass = false
-            }
-
-            if (this.isNot) pass = !pass
-
-            return {
-                message: () => assertionName,
-                pass,
-                name: assertionName,
-                expected: true,
-                actual: matcherResult?.actual
+export const expect = new LogExpect(baseExpect)
+    .defineLogs<[Locator, APIResponse]>([
+        {
+            toHaveText: (actual, not, expected) =>
+                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Text '${expected}' beinhaltet.`,
+            toBeEditable: (actual, not, options) => {
+                const editable = !options || options.editable
+                return `Prüfe, ob '${actual}'${(not && editable) || (!not && !editable) ? ' nicht ' : ' '}editierbar ist.`
             }
         },
-        toBeTestText(this: ExpectMatcherState, text: string) {
-            const assertionName = 'toBeTestText'
-            let pass: boolean
-            let matcherResult: any
-            try {
-                const expectation = this.isNot ? expect(text).not : expect(text)
-                expectation.toBe('test')
-                pass = true
-            } catch (e: any) {
-                matcherResult = e.matcherResult
-                pass = false
-            }
-
-            if (this.isNot) pass = !pass
-
-            return {
-                message: () => assertionName,
-                pass,
-                name: assertionName,
-                expected: true,
-                actual: matcherResult?.actual
-            }
+        {
+            toBeOK: (actual, not) =>
+                `Prüfe, ob Antwort von '${actual.url()}'${not ? ' nicht ' : ' '}OK ist.`
         }
-    },
-    {
-        toBeButtonType: (actual, not) =>
-            `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
-    }
-)
+    ])
+    .defineCustomMatchers(
+        {
+            async toBeButtonType(this: ExpectMatcherState, locator: Locator) {
+                const assertionName = 'toBeButtonType'
+                let pass: boolean
+                let matcherResult: any
+                try {
+                    const expectation = this.isNot
+                        ? expect(locator).not
+                        : expect(locator)
+                    await expectation.toHaveAttribute('type', 'button')
+                    pass = true
+                } catch (e: any) {
+                    matcherResult = e.matcherResult
+                    pass = false
+                }
+
+                if (this.isNot) pass = !pass
+
+                return {
+                    message: () => assertionName,
+                    pass,
+                    name: assertionName,
+                    expected: true,
+                    actual: matcherResult?.actual
+                }
+            },
+            toBeTestText(this: ExpectMatcherState, text: string) {
+                const assertionName = 'toBeTestText'
+                let pass: boolean
+                let matcherResult: any
+                try {
+                    const expectation = this.isNot
+                        ? expect(text).not
+                        : expect(text)
+                    expectation.toBe('test')
+                    pass = true
+                } catch (e: any) {
+                    matcherResult = e.matcherResult
+                    pass = false
+                }
+
+                if (this.isNot) pass = !pass
+
+                return {
+                    message: () => assertionName,
+                    pass,
+                    name: assertionName,
+                    expected: true,
+                    actual: matcherResult?.actual
+                }
+            }
+        },
+        {
+            toBeButtonType: (actual, not) =>
+                `Prüfe, ob '${actual}'${not ? ' nicht ' : ' '}den Typ 'button' hat.`
+        }
+    )
+    .build()
