@@ -77,8 +77,9 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     }
 
     /**
-     * Defines custom log messages for the default `expect` matchers.
-     * @param logs An array of log definitions.
+     * Defines custom test steps for the default `expect` matchers.
+     * @param logs A tuple of test step definition objects, one per value type, for the default matchers.
+     * @returns The `LogExpect` instance, allowing for chaining.
      */
     defineLogs<Ls extends unknown[]>(logs: {
         [I in keyof Ls]: Logs<typeof this.base<Ls[I]>, Ls[I]>
@@ -91,9 +92,10 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     }
 
     /**
-     * Defines custom matchers and optionally their corresponding log messages.
+     * Defines custom matchers and optionally their corresponding test step definitions.
      * @param customMatchers An object containing the custom matchers to define.
-     * @param customLogs An object containing the log messages for the custom matchers.
+     * @param customLogs An object containing the test step definitions for the custom matchers.
+     * @returns The `LogExpect` instance, allowing for chaining.
      */
     defineCustomMatchers<NewCM extends CustomMatchersBase>(
         customMatchers: NewCM,
@@ -207,7 +209,8 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
     }
 
     /**
-     * Builds the final `LogExpect` instance which is also a callable function. The returned function can be used as a normal expect function.
+     * Builds the final `LogExpect` instance as a callable function that can be used directly in place of `expect`.
+     * @returns A callable `LogExpect` instance that can be used as a replacement for `expect`.
      */
     build(): LogExpect<CM> &
         (<T>(
