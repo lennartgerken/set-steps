@@ -113,7 +113,6 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
                 ...customLogs
             }
         }
-        this.customMatcherTitles = new Set(Object.keys(customMatchers))
         return this as unknown as LogExpect<NewCM & CM>
     }
 
