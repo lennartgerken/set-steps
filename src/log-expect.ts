@@ -81,8 +81,8 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
      * @param logs A tuple of test step definition objects, one per value type, for the default matchers.
      * @returns The `LogExpect` instance, allowing for chaining.
      */
-    defineLogs<Ls extends unknown[]>(logs: {
-        [I in keyof Ls]: Logs<typeof this.base<Ls[I]>, Ls[I]>
+    defineLogs<L extends unknown[]>(logs: {
+        [I in keyof L]: Logs<typeof this.base<L[I]>, L[I]>
     }) {
         this.logs = logs.reduce(
             (merged, current) => Object.assign(merged, current),
