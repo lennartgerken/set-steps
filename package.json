@@ -32,7 +32,9 @@
     "module": "./dist/index.js",
     "main": "./dist/index.cjs",
     "files": [
-        "dist"
+        "dist/index.js",
+        "dist/index.cjs",
+        "dist/index.d.ts"
     ],
     "scripts": {
         "pretty": "prettier . --write",
