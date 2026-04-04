@@ -12,7 +12,7 @@ import {
     ExtendLocator,
     ExtendPage,
     ExtendRequest
-} from '@dist/log-elements'
+} from '@dist/index'
 
 declare module '@playwright/test' {
     interface Browser extends ExtendBrowser<typeof browserExtension> {}

@@ -3,9 +3,8 @@
         "module": "esnext",
         "moduleResolution": "bundler",
         "target": "es2020",
-        "outDir": "dist",
         "strict": true,
-        "skipLibCheck": true
-    },
-    "include": ["src"]
+        "skipLibCheck": true,
+        "noEmit": true
+    }
 }

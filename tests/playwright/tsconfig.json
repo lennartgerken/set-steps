@@ -1,10 +1,12 @@
 {
+    "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "module": "esnext",
-        "moduleResolution": "node",
-        "target": "es2020",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "skipLibCheck": false,
         "paths": {
-            "@dist/*": ["../../dist/esm/*"]
+            "@dist/*": ["../../dist/*"]
         }
-    }
+    },
+    "include": ["./**/*.ts", "../../playwright.config.ts"]
 }
