@@ -1,8 +1,8 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2020",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
         "skipLibCheck": false,
         "paths": {
             "@dist/*": ["../../dist/*"]

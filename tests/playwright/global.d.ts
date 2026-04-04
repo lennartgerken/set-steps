@@ -5,14 +5,14 @@ import {
     locatorExtension,
     pageExtension,
     requestExtension
-} from './custom-test'
+} from './custom-test.js'
 import {
     ExtendBrowser,
     ExtendContext,
     ExtendLocator,
     ExtendPage,
     ExtendRequest
-} from '@dist/index'
+} from '@dist/index.js'
 
 declare module '@playwright/test' {
     interface Browser extends ExtendBrowser<typeof browserExtension> {}

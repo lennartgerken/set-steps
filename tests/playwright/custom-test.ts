@@ -9,8 +9,8 @@ import {
     Page,
     APIResponse
 } from '@playwright/test'
-import { LogBrowser, LogExpect } from '@dist/index'
-import { url } from '../shared'
+import { LogBrowser, LogExpect } from '@dist/index.js'
+import { url } from '../shared.js'
 
 export const browserExtension = {
     async getNewContext(browser: Browser) {

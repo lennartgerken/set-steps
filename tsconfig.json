@@ -1,7 +1,10 @@
 {
     "compilerOptions": {
+        "module": "esnext",
+        "moduleResolution": "bundler",
         "target": "es2020",
         "strict": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "noEmit": true
     }
 }
