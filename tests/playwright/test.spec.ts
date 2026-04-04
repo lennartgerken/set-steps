@@ -1,6 +1,6 @@
-import { test, testNoChain, expect } from './custom-test.js'
-import { TestName } from './test-names.js'
-import { url } from '../shared.js'
+import { test, testNoChain, expect } from './custom-test'
+import { TestName } from './test-names'
+import { url } from '../shared'
 
 test(TestName.BROWSER, async ({ browser }) => {
     await browser.newContext()
