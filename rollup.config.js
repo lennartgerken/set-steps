@@ -1,18 +1,22 @@
 import typescript from '@rollup/plugin-typescript'
+import { dts } from 'rollup-plugin-dts'
+
+const external = ['@playwright/test', 'url']
 
 export default [
     {
         input: 'src/index.ts',
         output: {
-            file: 'dist/esm/index.js',
+            file: 'dist/index.js',
             format: 'es'
         },
-        external: ['@playwright/test', 'url'],
+        external,
         plugins: [
             typescript({
+                tsconfig: 'tsconfig.build.json',
                 compilerOptions: {
                     declaration: true,
-                    declarationDir: 'dist/esm'
+                    declarationDir: 'dist/types'
                 }
             })
         ]
@@ -20,10 +24,16 @@ export default [
     {
         input: 'src/index.ts',
         output: {
-            file: 'dist/cjs/index.cjs',
+            file: 'dist/index.cjs',
             format: 'cjs'
         },
-        external: ['@playwright/test', 'url'],
-        plugins: [typescript()]
+        external,
+        plugins: [typescript({ tsconfig: 'tsconfig.build.json' })]
+    },
+    {
+        input: 'dist/types/index.d.ts',
+        output: [{ file: 'dist/index.d.ts', format: 'es' }],
+        external,
+        plugins: [dts({ tsconfig: 'tsconfig.build.json' })]
     }
 ]
