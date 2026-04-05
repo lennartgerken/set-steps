@@ -9,7 +9,7 @@
         "paths": {
             "@dist/*": ["../dist/*"]
         },
-        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tests.tsbuildinfo"
+        "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.tests.tsbuildinfo"
     },
     "include": ["./**/*.ts"]
 }
