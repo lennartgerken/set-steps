@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "target": "es2020",
+        "rootDir": "src",
+        "outDir": "dist",
+        "strict": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.lib.tsbuildinfo"
+    },
+    "include": ["src"]
+}

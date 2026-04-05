@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
     testDir: './tests/playwright/',
-    tsconfig: './tests/playwright/tsconfig.json',
+    tsconfig: './tests/tsconfig.json',
     forbidOnly: !!process.env.CI,
     workers: process.env.CI ? 1 : undefined,
     reporter: [['json']],
