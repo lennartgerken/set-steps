@@ -13,7 +13,7 @@ export default [
         external,
         plugins: [
             typescript({
-                tsconfig: 'tsconfig.build.json',
+                tsconfig: 'tsconfig.lib.json',
                 compilerOptions: {
                     declaration: true,
                     declarationDir: 'dist/types'
@@ -28,12 +28,12 @@ export default [
             format: 'cjs'
         },
         external,
-        plugins: [typescript({ tsconfig: 'tsconfig.build.json' })]
+        plugins: [typescript({ tsconfig: 'tsconfig.lib.json' })]
     },
     {
         input: 'dist/types/index.d.ts',
         output: [{ file: 'dist/index.d.ts', format: 'es' }],
         external,
-        plugins: [dts({ tsconfig: 'tsconfig.build.json' })]
+        plugins: [dts({ tsconfig: 'tsconfig.lib.json' })]
     }
 ]

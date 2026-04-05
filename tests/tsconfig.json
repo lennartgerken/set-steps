@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "skipLibCheck": false,
+        "noEmit": true,
+        "strict": true,
+        "types": ["node"],
+        "paths": {
+            "@dist/*": ["../dist/*"]
+        },
+        "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.tests.tsbuildinfo"
+    },
+    "include": ["./**/*.ts"]
+}
