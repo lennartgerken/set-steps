@@ -22,8 +22,6 @@ jobs:
                   node-version: 24
             - name: Install dependencies
               run: npm ci
-            - name: Check config types
-              run: npm run type-check-config
             - name: Prettier
               run: npm run pretty-check
             - name: ESLint
@@ -32,7 +30,7 @@ jobs:
               run: npm run type-check
             - name: Build
               run: npm run build
-            - name: Check test types
-              run: npm run type-check-tests
+            - name: Check tool types
+              run: npm run type-check-tools
             - name: Run tests
               run: npm run test

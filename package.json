@@ -42,8 +42,7 @@
         "lint": "eslint .",
         "build": "rollup -c",
         "type-check": "tsc -p tsconfig.lib.json",
-        "type-check-config": "tsc -p tsconfig.config.json",
-        "type-check-tests": "tsc -p tests/tsconfig.json",
+        "type-check-tools": "tsc -p tsconfig.tools.json",
         "type-check-all": "tsc -b",
         "serve-test": "serve tests/playwright/public -l 3000",
         "test": "vitest run"
