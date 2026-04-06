@@ -1,0 +1,17 @@
+{
+    "include": ["vitest.config.*", "playwright.config.*", "./tests/**/*.ts"],
+    "compilerOptions": {
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "noEmit": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": false,
+        "types": ["node"],
+        "paths": {
+            "@dist/*": ["./dist/*"],
+            "@tests/*": ["./tests/*"]
+        },
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tools.tsbuildinfo"
+    }
+}
