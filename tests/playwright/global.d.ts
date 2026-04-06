@@ -19,6 +19,7 @@ declare module '@playwright/test' {
     interface BrowserContext extends ExtendContext<typeof contextExtension> {}
     interface Page extends ExtendPage<typeof pageExtension> {}
     interface Locator extends ExtendLocator<typeof locatorExtension> {}
-    interface APIRequestContext
-        extends ExtendRequest<typeof requestExtension> {}
+    interface APIRequestContext extends ExtendRequest<
+        typeof requestExtension
+    > {}
 }
