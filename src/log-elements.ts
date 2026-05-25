@@ -141,6 +141,8 @@ export interface LogRequest extends APIRequestContext {}
 export interface LogPage extends Page {}
 export interface LogLocator extends Locator {}
 
+const proxyCache = new WeakMap<object, object>()
+
 export abstract class LogElement<T extends object> {
     protected base: T
     protected usedName: string
@@ -164,6 +166,9 @@ export abstract class LogElement<T extends object> {
 
         const alterReturn = (returnValue: unknown): unknown => {
             if (returnValue != null) {
+                if (proxyCache.has(returnValue))
+                    return proxyCache.get(returnValue)
+
                 if (returnValue instanceof Promise)
                     return returnValue.then((fullfilled) =>
                         alterReturn(fullfilled)
@@ -176,17 +181,19 @@ export abstract class LogElement<T extends object> {
 
                 if (returnValue instanceof LogElement) return returnValue
 
+                let proxy: unknown
+
                 if (isBrowser(returnValue))
-                    return new LogBrowser(returnValue, options)
+                    proxy = new LogBrowser(returnValue, options)
 
                 if (isContext(returnValue))
-                    return new LogContext(returnValue, options)
+                    proxy = new LogContext(returnValue, options)
 
                 if (isPage(returnValue))
-                    return new LogPage(returnValue, options)
+                    proxy = new LogPage(returnValue, options)
 
                 if (isLocator(returnValue))
-                    return new LogLocator(returnValue, {
+                    proxy = new LogLocator(returnValue, {
                         ...options,
                         parentName:
                             this instanceof LogLocator
@@ -195,7 +202,12 @@ export abstract class LogElement<T extends object> {
                     })
 
                 if (isRequest(returnValue))
-                    return new LogRequest(returnValue, options)
+                    proxy = new LogRequest(returnValue, options)
+
+                if (proxy) {
+                    proxyCache.set(returnValue, proxy)
+                    return proxy
+                }
             }
             return returnValue
         }
