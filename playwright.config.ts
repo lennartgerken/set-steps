@@ -5,7 +5,7 @@ export default defineConfig({
     tsconfig: './tsconfig.tools.json',
     forbidOnly: !!process.env.CI,
     workers: process.env.CI ? 1 : undefined,
-    reporter: [['json']],
+    reporter: [['html', { open: 'never' }]],
     expect: {
         timeout: 5000
     },

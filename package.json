@@ -45,7 +45,7 @@
         "type-check-tools": "tsc -p tsconfig.tools.json",
         "type-check-all": "tsc -b",
         "serve-test": "serve tests/playwright/public -l 3000",
-        "test": "vitest run"
+        "test": "vitest run && playwright test test.spec.ts --project chromium"
     },
     "peerDependencies": {
         "@playwright/test": "^1.56.0"

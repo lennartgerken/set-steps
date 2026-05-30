@@ -146,7 +146,12 @@ export abstract class LogElement<T extends object> {
     protected usedName: string
     protected options: Required<Options>
 
-    constructor(base: T, name: string, options: Options = {}) {
+    constructor(
+        base: T,
+        name: string,
+        proxyCache: WeakMap<object, object>,
+        options: Options = {}
+    ) {
         this.base = base
         this.usedName = name
         this.options = {
@@ -164,6 +169,9 @@ export abstract class LogElement<T extends object> {
 
         const alterReturn = (returnValue: unknown): unknown => {
             if (returnValue != null) {
+                if (proxyCache.has(returnValue))
+                    return proxyCache.get(returnValue)
+
                 if (returnValue instanceof Promise)
                     return returnValue.then((fullfilled) =>
                         alterReturn(fullfilled)
@@ -176,17 +184,19 @@ export abstract class LogElement<T extends object> {
 
                 if (returnValue instanceof LogElement) return returnValue
 
+                let proxy: unknown
+
                 if (isBrowser(returnValue))
-                    return new LogBrowser(returnValue, options)
+                    proxy = new LogBrowser(returnValue, options)
 
                 if (isContext(returnValue))
-                    return new LogContext(returnValue, options)
+                    proxy = new LogContext(returnValue, proxyCache, options)
 
                 if (isPage(returnValue))
-                    return new LogPage(returnValue, options)
+                    proxy = new LogPage(returnValue, proxyCache, options)
 
                 if (isLocator(returnValue))
-                    return new LogLocator(returnValue, {
+                    proxy = new LogLocator(returnValue, proxyCache, {
                         ...options,
                         parentName:
                             this instanceof LogLocator
@@ -195,7 +205,12 @@ export abstract class LogElement<T extends object> {
                     })
 
                 if (isRequest(returnValue))
-                    return new LogRequest(returnValue, options)
+                    proxy = new LogRequest(returnValue, proxyCache, options)
+
+                if (proxy) {
+                    proxyCache.set(returnValue, proxy)
+                    return proxy
+                }
             }
             return returnValue
         }
@@ -326,25 +341,39 @@ export class LogBrowser extends LogElement<Browser> {
      * @param options Logging and extension configuration for wrapped elements.
      */
     constructor(browser: Browser, options: Options = {}) {
-        super(browser, browser.browserType().name(), options)
+        const proxyCache = new WeakMap<object, object>()
+        super(browser, browser.browserType().name(), proxyCache, options)
+        proxyCache.set(browser, this)
     }
 }
 
 export class LogContext extends LogElement<BrowserContext> {
-    constructor(context: BrowserContext, options: Options = {}) {
-        super(context, 'context', options)
+    constructor(
+        context: BrowserContext,
+        proxyCache: WeakMap<object, object>,
+        options: Options = {}
+    ) {
+        super(context, 'context', proxyCache, options)
     }
 }
 
 export class LogRequest extends LogElement<APIRequestContext> {
-    constructor(request: APIRequestContext, options: Options = {}) {
-        super(request, 'request', options)
+    constructor(
+        request: APIRequestContext,
+        proxyCache: WeakMap<object, object>,
+        options: Options = {}
+    ) {
+        super(request, 'request', proxyCache, options)
     }
 }
 
 export class LogPage extends LogElement<Page> {
-    constructor(page: Page, options: Options = {}) {
-        super(page, 'page', options)
+    constructor(
+        page: Page,
+        proxyCache: WeakMap<object, object>,
+        options: Options = {}
+    ) {
+        super(page, 'page', proxyCache, options)
     }
 }
 
@@ -353,9 +382,10 @@ export class LogLocator extends LogElement<Locator> {
 
     constructor(
         locator: Locator,
+        proxyCache: WeakMap<object, object>,
         options: Options & { parentName?: string } = {}
     ) {
-        super(locator, String(locator), options)
+        super(locator, String(locator), proxyCache, options)
         this.parentName = options.parentName
         if (this.options.chainLocatorNames) this.describe('')
         else this.describe(this.usedName)
