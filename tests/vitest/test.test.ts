@@ -1,6 +1,6 @@
 import { execSync } from 'child_process'
 import { expect, test, describe } from 'vitest'
-import { TestName } from '../playwright/test-names'
+import { TestName } from '../playwright/report-based-test-names'
 import { url } from '../shared'
 
 for (const browser of ['chromium', 'firefox', 'webkit']) {
@@ -23,7 +23,7 @@ for (const browser of ['chromium', 'firefox', 'webkit']) {
             getSpecs(
                 JSON.parse(
                     execSync(
-                        `npx playwright test --project ${browser}`
+                        `npx playwright test report-based.spec.ts --project ${browser} --reporter json`
                     ).toString()
                 ).suites[0]
             )
