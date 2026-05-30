@@ -341,7 +341,9 @@ export class LogBrowser extends LogElement<Browser> {
      * @param options Logging and extension configuration for wrapped elements.
      */
     constructor(browser: Browser, options: Options = {}) {
-        super(browser, browser.browserType().name(), new WeakMap(), options)
+        const proxyCache = new WeakMap<object, object>()
+        super(browser, browser.browserType().name(), proxyCache, options)
+        proxyCache.set(browser, this)
     }
 }
 
