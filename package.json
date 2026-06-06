@@ -1,6 +1,6 @@
 {
     "name": "set-steps",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "license": "MIT",
     "author": "Lennart Gerken",
     "description": "Automatically inject test steps into Playwright actions and extend core APIs with custom methods.",
@@ -52,7 +52,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@playwright/test": "^1.59.1",
+        "@playwright/test": "^1.60.0",
         "@rollup/plugin-typescript": "^12.3.0",
         "@types/node": "^25.5.2",
         "eslint": "^10.2.0",
