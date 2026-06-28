@@ -1,0 +1,16 @@
+{
+    "name": "set-steps",
+    "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-playwright.playwright"
+            ]
+        }
+    },
+    "containerEnv": {
+        "PLAYWRIGHT_HTML_HOST": "0.0.0.0"
+    }
+}
