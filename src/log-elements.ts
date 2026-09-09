@@ -14,7 +14,10 @@ type Logs<T> = {
             ? Key
             : never
         : never]?: T[Key] extends (...args: infer P) => any
-        ? (usedName: string, ...args: P) => string
+        ? (
+              usedName: string,
+              ...args: P
+          ) => string | { title: string; subtitle: string }
         : never
 }
 
@@ -278,32 +281,51 @@ export abstract class LogElement<T extends object> {
                     return (...args: any[]) => {
                         const realArgs = alterArgs(args)
 
-                        let logsToUse: any
+                        let log:
+                            | string
+                            | { title: string; subtitle: string }
+                            | undefined
 
-                        if (isBrowser(target.base))
-                            logsToUse = target.options.logs.browserLogs
-                        else if (isContext(target.base))
-                            logsToUse = target.options.logs.contextLogs
+                        const getLog = <T>(
+                            logs: Logs<T> | undefined
+                        ):
+                            | string
+                            | { title: string; subtitle: string }
+                            | undefined => {
+                            if (logs) {
+                                const logFunction = logs[prop as keyof Logs<T>]
+                                if (logFunction)
+                                    return logFunction(target.usedName, ...args)
+                            }
+                            return undefined
+                        }
+
+                        if (isBrowser(target.base)) {
+                            log = getLog(target.options.logs.browserLogs)
+                        } else if (isContext(target.base))
+                            log = getLog(target.options.logs.contextLogs)
                         else if (isRequest(target.base))
-                            logsToUse = target.options.logs.requestLogs
+                            log = getLog(target.options.logs.requestLogs)
                         else if (isPage(target.base))
-                            logsToUse = target.options.logs.pageLogs
+                            log = getLog(target.options.logs.pageLogs)
                         else if (isLocator(target.base))
-                            logsToUse = target.options.logs.locatorLogs
+                            log = getLog(target.options.logs.locatorLogs)
 
-                        const logFunction = logsToUse
-                            ? logsToUse[prop]
-                            : undefined
-
-                        if (logFunction != null) {
+                        if (log) {
                             return test.step(
-                                logFunction(target.usedName, ...args),
+                                typeof log === 'string' ? log : log.title,
                                 () => {
                                     return alterReturn(
                                         original.apply(target.base, realArgs)
                                     )
                                 },
-                                { location: getLocation() }
+                                {
+                                    location: getLocation(),
+                                    subtitle:
+                                        typeof log === 'string'
+                                            ? undefined
+                                            : log.subtitle
+                                }
                             )
                         }
                         return alterReturn(
