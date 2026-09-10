@@ -257,7 +257,13 @@ export abstract class LogElement<T extends object> {
             get(target, prop, receiver) {
                 if (prop in target) return Reflect.get(target, prop, receiver)
 
-                let extensionToUse: any
+                let extensionToUse:
+                    | BrowserExtension
+                    | ContextExtension
+                    | RequestExtension
+                    | PageExtension
+                    | LocatorExtension
+                    | undefined
 
                 if (isBrowser(target.base))
                     extensionToUse = target.options.browserExtension
@@ -270,9 +276,13 @@ export abstract class LogElement<T extends object> {
                 else if (isLocator(target.base))
                     extensionToUse = target.options.locatorExtension
 
-                if (extensionToUse && prop in extensionToUse) {
+                if (
+                    extensionToUse &&
+                    typeof prop === 'string' &&
+                    prop in extensionToUse
+                ) {
                     return (...args: any[]) => {
-                        return extensionToUse[prop as string](receiver, ...args)
+                        return extensionToUse[prop](receiver, ...args)
                     }
                 }
                 const original = Reflect.get(target.base, prop, receiver)
