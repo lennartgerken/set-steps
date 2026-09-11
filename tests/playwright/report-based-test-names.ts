@@ -23,5 +23,6 @@ export enum TestName {
     LOCATOR_EXPECT_NOT = 'locator expect not',
     LOCATOR_NO_CHAIN = 'locator no chain',
     PAGE = 'page',
-    REQUEST = 'request'
+    REQUEST = 'request',
+    SUBTITLE = 'subtitle'
 }

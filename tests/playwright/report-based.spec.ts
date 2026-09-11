@@ -142,6 +142,10 @@ test.describe(() => {
             async () => {}
         )
     })
+
+    test(TestName.SUBTITLE, async ({ page }) => {
+        await page.getByLabel('text-enabled').describe('Textfeld').focus()
+    })
 })
 
 test(TestName.EXTENSION_BROWSER, async ({ browser }) => {
