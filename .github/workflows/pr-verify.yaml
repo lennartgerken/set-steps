@@ -11,13 +11,13 @@ jobs:
         permissions:
             contents: read
         container:
-            image: mcr.microsoft.com/playwright:v1.60.0-noble
+            image: mcr.microsoft.com/playwright:v1.63.0-noble
             options: --user 1001
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v7
             - name: Setup Node
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version: 24
             - name: Install dependencies
