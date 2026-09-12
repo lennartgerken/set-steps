@@ -174,7 +174,7 @@ for (const browser of ['chromium', 'firefox', 'webkit']) {
 
         test(TestName.SUBTITLE, () => {
             const result = tests.get(TestName.SUBTITLE)
-            expect(result?.title).toBe('Fokusiere Element.')
+            expect(result?.title).toBe('Fokussiere Element.')
             expect(result?.subtitle).toBe('Textfeld')
         })
     })

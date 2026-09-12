@@ -67,7 +67,7 @@ const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
                 pressSequentially: (name, value) =>
                     `Gebe Text '${value}' in '${name}' ein.`,
                 focus: (name) => ({
-                    title: 'Fokusiere Element.',
+                    title: 'Fokussiere Element.',
                     subtitle: name
                 })
             },
