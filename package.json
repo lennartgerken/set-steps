@@ -50,11 +50,11 @@
         "devcontainer:pw-report": "npx playwright show-report --host 0.0.0.0"
     },
     "peerDependencies": {
-        "@playwright/test": "^1.56.0"
+        "@playwright/test": "^1.63.0"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@playwright/test": "^1.60.0",
+        "@playwright/test": "^1.63.0",
         "@rollup/plugin-typescript": "^12.3.0",
         "@types/node": "^25.5.2",
         "eslint": "^10.2.0",

@@ -65,7 +65,11 @@ const createLogBrowser = (browser: Browser, chainLocatorNames: boolean) => {
                     `Klicke${options && options.clickCount ? ` ${options.clickCount} mal ` : ' '}Element '${name}'.`,
                 fill: (name, value) => `Schreibe Wert '${value}' in '${name}'.`,
                 pressSequentially: (name, value) =>
-                    `Gebe Text '${value}' in '${name}' ein.`
+                    `Gebe Text '${value}' in '${name}' ein.`,
+                focus: (name) => ({
+                    title: 'Fokussiere Element.',
+                    subtitle: name
+                })
             },
             requestLogs: {
                 get: (_name, url) => `Sende GET Request an '${url}'.`

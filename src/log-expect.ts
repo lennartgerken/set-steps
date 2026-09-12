@@ -11,7 +11,11 @@ type Logs<T extends (...args: any) => any, A> = {
             ? K
             : never
         : never]?: ReturnType<T>[K] extends (...args: infer P) => any
-        ? (actual: A, not: boolean, ...args: P) => string
+        ? (
+              actual: A,
+              not: boolean,
+              ...args: P
+          ) => string | { title: string; subtitle: string }
         : never
 }
 
@@ -29,7 +33,11 @@ type CustomLogs<T extends Record<string, any>> = {
         receiver: infer R,
         ...args: infer P
     ) => any
-        ? (actual: R, not: boolean, ...args: P) => string
+        ? (
+              actual: R,
+              not: boolean,
+              ...args: P
+          ) => string | { title: string; subtitle: string }
         : never
 }
 
@@ -169,17 +177,36 @@ export class LogExpect<CM extends Record<string, any> = Record<string, never>> {
 
                     if (typeof originalToUse === 'function') {
                         return (...args: any[]) => {
-                            const logFunction = (parent.logs as any)[prop]
+                            let log:
+                                | string
+                                | { title: string; subtitle: string }
+                                | undefined
+
+                            const logFunction =
+                                parent.logs[prop as keyof typeof parent.logs]
                             if (logFunction) {
+                                log = logFunction(
+                                    actual,
+                                    not,
+                                    ...(args as never[])
+                                )
+                            }
+                            if (log) {
                                 return test.step(
-                                    logFunction(actual, not, ...args),
+                                    typeof log === 'string' ? log : log.title,
                                     () => {
                                         return originalToUse.apply(
                                             targetToUse,
                                             args
                                         )
                                     },
-                                    { location: getLocation() }
+                                    {
+                                        location: getLocation(),
+                                        subtitle:
+                                            typeof log === 'string'
+                                                ? undefined
+                                                : log.subtitle
+                                    }
                                 )
                             }
                             return originalToUse.apply(targetToUse, args)
